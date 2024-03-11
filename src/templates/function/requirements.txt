@@ -1,0 +1,8 @@
+functions-framework
+google-cloud-aiplatform
+google-cloud-bigquery
+google-cloud-pubsub
+json_repair == 0.*
+pandas-gbq
+protobuf
+vertexai

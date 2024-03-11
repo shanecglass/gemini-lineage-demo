@@ -1,0 +1,32 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "iso_639_2",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "iso_639_2b",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "iso_639_1",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "language_name_en",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "language_name_fr",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "language_name_de",
+    "type": "STRING"
+  }
+]
