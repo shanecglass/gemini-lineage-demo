@@ -45,7 +45,6 @@ module "project-services" {
     "translate.googleapis.com",
     "vision.googleapis.com",
     "workflows.googleapis.com",
-    "workflows-executions.googleapis.com",
   ]
 
   activate_api_identities = [
