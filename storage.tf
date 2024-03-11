@@ -26,10 +26,17 @@ resource "google_storage_bucket" "function_source" {
 }
 
 ##Upload the function source code to the bucket
-resource "google_storage_bucket_object" "function_source_upload" {
+resource "google_storage_bucket_object" "gaacsa_function_source_upload" {
   name   = "function_source.zip"
   bucket = google_storage_bucket.function_source.name
   source = data.archive_file.create_function_zip.output_path
+}
+
+## Upload the zip file of the source code to GCS
+resource "google_storage_bucket_object" "notebook_function_source_upload" {
+  name   = "notebooks_function_source.zip"
+  bucket = google_storage_bucket.function_source.name
+  source = data.archive_file.create_notebook_function_zip.output_path
 }
 
 #Create a GCS bucket to the source data

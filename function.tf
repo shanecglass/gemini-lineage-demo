@@ -70,7 +70,7 @@ resource "google_cloudfunctions2_function" "gaacsa" {
     source {
       storage_source {
         bucket = google_storage_bucket.function_source.name
-        object = google_storage_bucket_object.function_source_upload.name
+        object = google_storage_bucket_object.gaacsa_function_source_upload.name
       }
     }
   }
@@ -93,4 +93,56 @@ resource "google_cloudfunctions2_function" "gaacsa" {
 
   depends_on = [google_project_iam_member.function_manage_roles]
 
+}
+
+
+# Create and deploy a Cloud Function to deploy notebooks
+## Create the Cloud Function
+resource "google_cloudfunctions2_function" "notebook_deploy_function" {
+  name        = "deploy-notebooks"
+  project     = module.project-services.project_id
+  location    = var.region
+  description = "A Cloud Function that deploys sample notebooks."
+  build_config {
+    runtime     = "python311"
+    entry_point = "run_it"
+
+    source {
+      storage_source {
+        bucket = google_storage_bucket.function_source.name
+        object = google_storage_bucket_object.notebook_function_source_upload.name
+      }
+    }
+  }
+
+  service_config {
+    max_instance_count = 1
+    # min_instance_count can be set to 1 to improve performance and responsiveness
+    min_instance_count               = 0
+    available_memory                 = "512Mi"
+    timeout_seconds                  = 300
+    max_instance_request_concurrency = 1
+    available_cpu                    = "2"
+    ingress_settings                 = "ALLOW_ALL"
+    all_traffic_on_latest_revision   = true
+    service_account_email            = google_service_account.cloud_function_manage_sa.email
+    environment_variables = {
+      "PROJECT_ID" : module.project-services.project_id,
+      "REGION" : local.dataform_region
+    }
+  }
+
+  depends_on = [
+    time_sleep.wait_after_apis,
+    google_project_iam_member.function_manage_roles,
+    google_dataform_repository.notebook_repo,
+    google_dataform_repository_iam_member.workflow_manage_repo,
+    google_dataform_repository_iam_member.function_manage_repo
+  ]
+}
+
+## Wait for Function deployment to complete
+resource "time_sleep" "wait_after_function" {
+  create_duration = "5s"
+  depends_on      = [google_cloudfunctions2_function.notebook_deploy_function, google_cloudfunctions2_function.gaacsa]
 }
