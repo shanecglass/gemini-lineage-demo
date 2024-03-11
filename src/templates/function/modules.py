@@ -13,7 +13,7 @@ from vertexai.vision_models import Image, MultiModalEmbeddingModel
 # Change the values of the 4 lines below to match your requirements
 
 # Project ID
-project_id = os.environ['PROJ']
+project_id = os.environ['PROJECT_ID']
 # Pub/Sub Topic ID for prompt
 prompt_pubsub_topic_id = "gemini-multimodal-demo-prompts"
 # Pub/Sub Topic ID for response

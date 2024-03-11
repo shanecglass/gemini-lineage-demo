@@ -36,7 +36,7 @@ resource "google_project_iam_member" "gcs_connection_iam_object_viewer" {
 resource "google_bigquery_dataset" "infra_dataset" {
   project    = module.project-services.project_id
   dataset_id = var.bq_dataset
-  location   = var.region
+  location   = var.multi_region
   depends_on = [time_sleep.wait_after_apis]
 }
 
@@ -160,7 +160,7 @@ resource "google_bigquery_table" "service_policy" {
 resource "google_bigquery_dataset" "lineage_dataset" {
   project    = module.project-services.project_id
   dataset_id = "${var.bq_dataset}_lineage"
-  location   = var.region
+  location   = var.multi_region
   depends_on = [time_sleep.wait_after_apis]
 }
 
