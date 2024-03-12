@@ -71,7 +71,7 @@ variable "enable_apis" {
 variable "force_destroy" {
   type        = string
   description = "Whether or not to protect BigQuery resources from deletion when solution is modified or changed."
-  default     = false
+  default     = true
 }
 
 variable "use_case_short" {
@@ -88,5 +88,6 @@ variable "public_data_bucket" {
 
 variable "deletion_protection" {
   type    = string
-  default = true
+  default = false
+  description = "Whether or not to protect Google Cloud Storage resources from deletion when solution is modified or changed."
 }

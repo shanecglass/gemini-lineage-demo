@@ -104,7 +104,7 @@ create_tables:
                             body:
                                 useLegacySql: false
                                 useQueryCache: false
-                                location: $${sys.get_env("GOOGLE_CLOUD_LOCATION")}
+                                location: "US"
                                 timeoutMs: 600000
                                 query: $${map[key]}
                         result: queryResult
