@@ -51,7 +51,7 @@ resource "google_bigquery_table" "tbl_users" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.name
+    connection_id = google_bigquery_connection.gcs_connection.connection_id
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/cymbal_sports_users.parquet"]
   }
@@ -71,7 +71,7 @@ resource "google_bigquery_table" "tbl_raw_reviews" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.name
+    connection_id = google_bigquery_connection.gcs_connection.connection_id
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/raw_reviews.parquet"]
   }
@@ -92,7 +92,7 @@ resource "google_bigquery_table" "tbl_iso_639_codes" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.name
+    connection_id = google_bigquery_connection.gcs_connection.connection_id
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/iso_639_codes.parquet"]
   }
@@ -216,7 +216,7 @@ resource "google_bigquery_routine" "sp_bigqueryml_generate_create" {
   definition_body = templatefile("${path.module}/src/templates/sql/create_models/generate_text.sql", {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
-    connection_id = google_bigquery_connection.vertex_connection.name,
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     region        = var.multi_region
     }
   )
@@ -234,7 +234,7 @@ resource "google_bigquery_routine" "sp_nlp_create" {
   definition_body = templatefile("${path.module}/src/templates/sql/create_models/nlp.sql", {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
-    connection_id = google_bigquery_connection.vertex_connection.name,
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     region        = var.multi_region
     }
   )
@@ -252,7 +252,7 @@ resource "google_bigquery_routine" "sp_vision_ai_create" {
   definition_body = templatefile("${path.module}/src/templates/sql/create_models/vision_ai.sql", {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
-    connection_id = google_bigquery_connection.vertex_connection.name,
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     region        = var.multi_region
     }
   )
@@ -270,7 +270,7 @@ resource "google_bigquery_routine" "sp_translate_create" {
   definition_body = templatefile("${path.module}/src/templates/sql/create_models/translate.sql", {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
-    connection_id = google_bigquery_connection.vertex_connection.name,
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     region        = var.multi_region
     }
   )
@@ -308,7 +308,7 @@ resource "google_bigquery_routine" "sp_remote_function_create" {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.lineage_dataset.dataset_id,
     region        = var.multi_region,
-    connection_id = google_bigquery_connection.vertex_connection.name,
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     function_url  = google_cloudfunctions2_function.gaacsa.url,
     }
   )
