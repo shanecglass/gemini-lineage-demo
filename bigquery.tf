@@ -81,6 +81,27 @@ resource "google_bigquery_table" "tbl_raw_reviews" {
 
 }
 
+## Create a GCS Object Table for the product list reviews
+resource "google_bigquery_table" "tbl_product_list" {
+  dataset_id          = google_bigquery_dataset.infra_dataset.dataset_id
+  table_id            = "products"
+  project             = module.project-services.project_id
+  deletion_protection = var.deletion_protection
+
+  schema = file("${path.module}/src/schema/product_list.json")
+
+  external_data_configuration {
+    autodetect    = true
+    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    source_format = "PARQUET"
+    source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/products.parquet"]
+  }
+
+  labels     = var.labels
+  depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
+
+}
+
 ## Create a Biglake table for ISO 639 codes
 resource "google_bigquery_table" "tbl_iso_639_codes" {
   dataset_id          = google_bigquery_dataset.infra_dataset.dataset_id
