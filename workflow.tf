@@ -48,7 +48,7 @@ resource "google_project_iam_member" "workflow_service_account_roles" {
 }
 
 ## Create the workflow
-resource "google_workflows_workflow" "workflow" {
+resource "google_workflows_workflow" "setup_workflow" {
   name            = "setup-workflow"
   project         = module.project-services.project_id
   region          = var.region
@@ -70,7 +70,7 @@ resource "google_workflows_workflow" "workflow" {
     google_bigquery_table.tbl_review_images,
     google_bigquery_routine.sp_remote_function_create,
     google_bigquery_connection.gcs_connection,
-    google_bigquery_routine.sp_reviews_joins_create,
+    google_bigquery_routine.sp_raw_reviews_joined_create,
     google_bigquery_routine.sp_translate_create,
     google_bigquery_routine.sp_vision_ai_create,
     google_bigquery_routine.sp_nlp_create,
@@ -85,17 +85,17 @@ resource "google_workflows_workflow" "workflow" {
 module "workflow_polling_1" {
   source = "./workflow_polling"
 
-  workflow_id          = google_workflows_workflow.workflow.id
+  workflow_id          = google_workflows_workflow.setup_workflow.id
   input_workflow_state = null
 
   depends_on = [
-    google_workflows_workflow.workflow,
+    google_workflows_workflow.setup_workflow,
   ]
 }
 
 module "workflow_polling_2" {
   source      = "./workflow_polling"
-  workflow_id = google_workflows_workflow.workflow.id
+  workflow_id = google_workflows_workflow.setup_workflow.id
 
   input_workflow_state = module.workflow_polling_1.workflow_state
 
@@ -106,7 +106,7 @@ module "workflow_polling_2" {
 
 module "workflow_polling_3" {
   source      = "./workflow_polling"
-  workflow_id = google_workflows_workflow.workflow.id
+  workflow_id = google_workflows_workflow.setup_workflow.id
 
   input_workflow_state = module.workflow_polling_2.workflow_state
 
@@ -117,7 +117,7 @@ module "workflow_polling_3" {
 
 module "workflow_polling_4" {
   source      = "./workflow_polling"
-  workflow_id = google_workflows_workflow.workflow.id
+  workflow_id = google_workflows_workflow.setup_workflow.id
 
   input_workflow_state = module.workflow_polling_3.workflow_state
 

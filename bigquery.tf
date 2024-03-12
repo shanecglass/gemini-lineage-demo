@@ -53,7 +53,7 @@ resource "google_bigquery_table" "tbl_users" {
     autodetect    = true
     connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
-    source_uris   = ["gs://${google_storage_bucket.data_source.name}/bq-data/cymbal_sports_users.parquet"]
+    source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/cymbal_sports_users.parquet"]
   }
 
   labels     = var.labels
@@ -73,7 +73,7 @@ resource "google_bigquery_table" "tbl_raw_reviews" {
     autodetect    = true
     connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
-    source_uris   = ["gs://${google_storage_bucket.data_source.name}/bq-data/raw_reviews.parquet"]
+    source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/raw_reviews.parquet"]
   }
 
   labels     = var.labels
@@ -94,7 +94,7 @@ resource "google_bigquery_table" "tbl_iso_639_codes" {
     autodetect    = true
     connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
-    source_uris   = ["gs://${google_storage_bucket.data_source.name}/bq-data/iso_639_codes.parquet"]
+    source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/iso_639_codes.parquet"]
   }
 
   labels     = var.labels
@@ -112,7 +112,7 @@ resource "google_bigquery_table" "inventory_images" {
   external_data_configuration {
     autodetect      = false
     connection_id   = google_bigquery_connection.gcs_connection.id
-    source_uris     = ["${google_storage_bucket.data_source.url}/inventory_images/*.png"]
+    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/inventory_images/*.png"]
     object_metadata = "Simple"
   }
 
@@ -130,7 +130,7 @@ resource "google_bigquery_table" "tbl_review_images" {
   external_data_configuration {
     autodetect      = false
     connection_id   = google_bigquery_connection.gcs_connection.id
-    source_uris     = ["${google_storage_bucket.data_source.url}/review_images/*.png"]
+    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/review_images/*.png"]
     object_metadata = "Simple"
   }
 
@@ -148,7 +148,7 @@ resource "google_bigquery_table" "service_policy" {
   external_data_configuration {
     autodetect      = false
     connection_id   = google_bigquery_connection.gcs_connection.id
-    source_uris     = ["${google_storage_bucket.data_source.url}/service_policy/*.png"]
+    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/service_policy/*.png"]
     object_metadata = "Simple"
   }
 
@@ -278,7 +278,7 @@ resource "google_bigquery_routine" "sp_translate_create" {
 }
 
 ## Create the raw_reviews_joined table stored procedure
-resource "google_bigquery_routine" "sp_reviews_joins_create" {
+resource "google_bigquery_routine" "sp_raw_reviews_joined_create" {
   project      = module.project-services.project_id
   dataset_id   = google_bigquery_dataset.infra_dataset.dataset_id
   routine_id   = "sp_raw_reviews_joined_create"
