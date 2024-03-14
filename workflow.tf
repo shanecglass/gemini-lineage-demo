@@ -77,7 +77,7 @@ resource "google_workflows_workflow" "setup_workflow" {
     google_bigquery_routine.sp_bigqueryml_generate_create,
     time_sleep.wait_after_function,
     google_storage_bucket.data_source,
-    module.pubsub,
+    google_project_iam_member.pubsub_sa_auth,
 
   ]
 }

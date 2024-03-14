@@ -61,6 +61,10 @@ module "project-services" {
       roles = [
         "roles/run.invoker"
       ]
+      api = "pubsub.googleapis.com"
+      roles = [
+        "roles/pubsub.publisher"
+      ]
     }
   ]
 }

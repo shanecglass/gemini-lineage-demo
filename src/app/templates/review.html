@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+You've got mail!
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 ps-md-5">
+
+      <!-- note, the id is not used in the template -->
+
+      <h1 class="pt-5 pb-2">You've got mail!</h1>
+
+      <p><a href="{{ url_for('index') }}">Return to search page</a></p>
+
+      <!--
+	      notice how the URL in the link above is rendered for
+	      Flask - it needs to name the FUNCTION, not the route
+      -->
+
+      <p>Here's what we came up with based on your input. Take a look:</p>
+
+      <div class="row">
+      <p><b>Subject: </b></br>{{ email_subject }}</p>
+      </div>
+      <div class="row">
+      <p><b>Body: </b></br>{{ email_body }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -19,7 +19,7 @@ def parse_input(request):
 
 def get_required_inputs(review_id):
     # bq_client = bigquery.Client()
-    project_id = os.environ['PROJ']
+    project_id = os.environ['PROJECT_ID']
     regexp_inventory_uri = "r'^gs.*([0-9]{3}).png$'"
     sql = f"""
         with hold AS(

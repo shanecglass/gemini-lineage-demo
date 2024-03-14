@@ -60,6 +60,25 @@ resource "google_bigquery_table" "tbl_users" {
   depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
 }
 
+resource "google_bigquery_table" "tbl_order_items" {
+  dataset_id          = google_bigquery_dataset.infra_dataset.dataset_id
+  table_id            = "order_items"
+  project             = module.project-services.project_id
+  deletion_protection = var.deletion_protection
+
+  schema = file("${path.module}/src/schema/order_items.json")
+
+  external_data_configuration {
+    autodetect    = true
+    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    source_format = "PARQUET"
+    source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/order_items.parquet"]
+  }
+
+  labels     = var.labels
+  depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
+}
+
 ## Create a GCS Object Table for raw reviews
 resource "google_bigquery_table" "tbl_raw_reviews" {
   dataset_id          = google_bigquery_dataset.infra_dataset.dataset_id
@@ -198,7 +217,7 @@ resource "google_bigquery_table" "pubsub_dest_tables" {
     type  = "HOUR"
   }
 
-  schema = file("${path.module}/src/schema/pubsub_tables.json")
+  schema = file("${path.module}/src/schema/${each.key}.json")
 }
 
 #Create resource connection for Vertex AI

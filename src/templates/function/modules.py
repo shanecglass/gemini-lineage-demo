@@ -95,10 +95,10 @@ def publish_prompt_pubsub(review_id,
     review_embeddings = json.dumps(review_embeddings)
     image_embed = json.dumps(image_embed)
     dict = {"review_id": review_id,
-            "review_embed": review_embeddings,
+            "review_embedding": review_embeddings,
             "prompt": prompt,
-            "text_embed": text_embed,
-            "image_embed": image_embed,
+            "prompt_embedding": text_embed,
+            "image_embedding": image_embed,
             "model_version": model_version,
             "policy_version": policy_version}
     data_string = json.dumps(dict)

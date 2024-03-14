@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+
+{% block styles %}
+{{ super() }}
+    <style>
+        body { background: #e8f1f9; }
+    </style>
+{% endblock %}
+
+
+{% block title %}
+Email Marketing Copy Generator
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
+
+      <h1 class="pt-5 pb-2">Welcome to the Email Marketing Copy Generator!</h1>
+
+      <p class="lead">This form uses a <a href="https://blog.google/technology/ai/google-palm-2-ai-large-language-model/">Large Language Model (LLM)</a> to generate email marketing copy based on your inputs.
+      Currently, you can add your preferred tone to the message and it will generate an answer. Additionally, we plan to add support for additional feature, such as customizing emails by user profile and activity.</p>
+      <p><b>How to use this app</b></p>
+      <p><ol>
+        <li>Describe the reason for your email, the tone you want it to have, and any other factors that should be considered</li>
+        <li>Click "Submit"</li>
+        <li>Copy and paste the subject and body of the email into your CMS!</li>
+      </ol></p>
+
+      {{ render_form(form) }}
+      {{ form.crsf_token }}
+
+      <p class="pt-5"><strong>{{ message }}</strong></p>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

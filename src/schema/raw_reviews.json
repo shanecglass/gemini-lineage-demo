@@ -4,8 +4,12 @@
     "type": "STRING"
   },
   {
+    "name": "order_id",
+    "type": "STRING"
+  },
+  {
     "name": "user_id",
-    "type": "INTEGER"
+    "type": "STRING"
   },
   {
     "name": "product_id",
