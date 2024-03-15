@@ -73,10 +73,14 @@ def index():
                     image_path = os.path.join(
                         app.config['UPLOAD_FOLDER'], filename)
                     file.save(image_path)
+                else:
+                    return render_template('index.html', form=form)
                 modules.call_llm(model_inputs, form_data, image_path)
                 return redirect(url_for('review.html'))
             else:
                 return render_template('index.html', form=form)
+    else:
+        return render_template('index.html', form=form)
 
 # Route users to the model response to view their email
 
