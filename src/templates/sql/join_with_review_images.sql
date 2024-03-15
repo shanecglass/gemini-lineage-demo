@@ -4,7 +4,6 @@ AS
 WITH the_join AS(
   SELECT
     reviews.*,
-    orders.id AS order_id,
     orders.created_at AS created_at
   FROM
     `${project_id}.${dataset_id}.raw_reviews` reviews
@@ -41,8 +40,8 @@ output AS (
   SELECT
     hold.review_id,
     hold.order_id,
-    hold.user_id,
-    product_id,
+    user_id,
+    hold.product_id,
     name,
     review_rating,
     review_text
