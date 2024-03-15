@@ -8,9 +8,9 @@ import pandas_gbq
 
 from google.cloud import pubsub_v1
 from vertexai import generative_models
-from vertexai.generative_models import GenerativeModel
+from vertexai.generative_models import GenerativeModel, Image, Part
 from vertexai.language_models import TextEmbeddingModel
-from vertexai.vision_models import Image, Part, MultiModalEmbeddingModel
+from vertexai.vision_models import MultiModalEmbeddingModel
 
 
 # Change the values of the 4 lines below to match your requirements
