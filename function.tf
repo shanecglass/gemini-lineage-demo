@@ -81,7 +81,7 @@ resource "google_cloudfunctions2_function" "gaacsa" {
     environment_variables = {
       "PROJECT_ID" : "${module.project-services.project_id}",
       "REGION" : "${var.region}"
-      "OUTPUT_BUCKET" : "${google_storage_bucket.data_source}"
+      "OUTPUT_BUCKET" : "${google_storage_bucket.data_source.name}"
     }
   }
 
