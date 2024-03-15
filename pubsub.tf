@@ -25,7 +25,7 @@ resource "google_project_service_identity" "pubsub_sa" {
   project = module.project-services.project_id
   service = "pubsub.googleapis.com"
 
-  depends_on = [ time_sleep.wait_after_apis ]
+  depends_on = [time_sleep.wait_after_apis]
 }
 
 resource "google_project_iam_member" "pubsub_sa_auth" {
@@ -47,7 +47,7 @@ resource "google_pubsub_topic" "topics" {
 
   message_retention_duration = "86600s"
 
-  depends_on = [ google_project_service_identity.pubsub_sa ]
+  depends_on = [google_project_service_identity.pubsub_sa]
 }
 
 resource "google_pubsub_subscription" "subs" {
@@ -61,7 +61,7 @@ resource "google_pubsub_subscription" "subs" {
     table            = "${module.project-services.project_id}.${google_bigquery_dataset.lineage_dataset.dataset_id}.${each.key}"
     use_table_schema = true
   }
-  depends_on = [ google_bigquery_dataset.lineage_dataset, google_pubsub_topic.topics ]
+  depends_on = [google_bigquery_dataset.lineage_dataset, google_pubsub_topic.topics]
 }
 
 
