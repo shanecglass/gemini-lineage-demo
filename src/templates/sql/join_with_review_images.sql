@@ -4,15 +4,16 @@ AS
 WITH the_join AS(
   SELECT
     reviews.*,
-    orders.order_id AS order_id,
+    orders.id AS order_id,
     orders.created_at AS created_at
   FROM
     `${project_id}.${dataset_id}.raw_reviews` reviews
   LEFT JOIN
     `${project_id}.${dataset_id}.order_items` orders
   ON
-    reviews.user_id = orders.user_id
-    AND reviews.product_id = CAST(orders.product_id AS STRING)),
+      reviews.user_id = orders.user_id
+      AND reviews.product_id = CAST(orders.product_id AS STRING)
+      AND reviews.order_id = orders.id),
 
 hold AS(
   SELECT

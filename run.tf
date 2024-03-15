@@ -52,8 +52,8 @@ resource "terraform_data" "bld_and_deploy" {
     EOT
 
     environment = {
-      PROJ   = module.project-services.project_id
-      REGION = var.region
+      PROJECT_ID = module.project-services.project_id
+      REGION     = var.region
     }
   }
   depends_on = [google_project_iam_member.cloud_run_invoke_roles]
