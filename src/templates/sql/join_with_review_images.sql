@@ -1,5 +1,4 @@
-CREATE OR REPLACE TABLE
-`${project_id}.${dataset_id}.raw_reviews_joined`
+CREATE OR REPLACE TABLE `${project_id}.${dataset_id}.raw_reviews_joined`
 AS
 
 WITH the_join AS(
@@ -17,9 +16,9 @@ WITH the_join AS(
 
 hold AS(
   SELECT
-    review_id,
-    order_id,
-    product_id,
+    the_join.review_id,
+    the_join.order_id,
+    the_join.product_id,
     ARRAY_AGG(STRUCT(
         created_at,
         user_id,
@@ -39,9 +38,9 @@ hold AS(
 
 output AS (
   SELECT
-    review_id,
-    order_id,
-    user_id,
+    hold.review_id,
+    hold.order_id,
+    hold.user_id,
     product_id,
     name,
     review_rating,
