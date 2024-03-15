@@ -51,7 +51,7 @@ resource "google_bigquery_table" "tbl_users" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/cymbal_sports_users.parquet"]
   }
@@ -70,7 +70,7 @@ resource "google_bigquery_table" "tbl_order_items" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/order_items.parquet"]
   }
@@ -90,7 +90,7 @@ resource "google_bigquery_table" "tbl_raw_reviews" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/raw_reviews.parquet"]
   }
@@ -111,7 +111,7 @@ resource "google_bigquery_table" "tbl_product_list" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/products.parquet"]
   }
@@ -132,7 +132,7 @@ resource "google_bigquery_table" "tbl_iso_639_codes" {
 
   external_data_configuration {
     autodetect    = true
-    connection_id = google_bigquery_connection.gcs_connection.connection_id
+    connection_id = google_bigquery_connection.gcs_connection.name
     source_format = "PARQUET"
     source_uris   = ["gs://${google_storage_bucket.data_source.name}/cymbal-sports/bq-data/iso_639_codes.parquet"]
   }
@@ -151,7 +151,7 @@ resource "google_bigquery_table" "inventory_images" {
 
   external_data_configuration {
     autodetect      = false
-    connection_id   = google_bigquery_connection.gcs_connection.id
+    connection_id   = google_bigquery_connection.gcs_connection.name
     source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/inventory_images/*.png"]
     object_metadata = "Simple"
   }
@@ -169,7 +169,7 @@ resource "google_bigquery_table" "tbl_review_images" {
 
   external_data_configuration {
     autodetect      = false
-    connection_id   = google_bigquery_connection.gcs_connection.id
+    connection_id   = google_bigquery_connection.gcs_connection.name
     source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/review_images/*.png"]
     object_metadata = "Simple"
   }
@@ -187,7 +187,7 @@ resource "google_bigquery_table" "service_policy" {
 
   external_data_configuration {
     autodetect      = false
-    connection_id   = google_bigquery_connection.gcs_connection.id
+    connection_id   = google_bigquery_connection.gcs_connection.name
     source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/service_policy/*.png"]
     object_metadata = "Simple"
   }
