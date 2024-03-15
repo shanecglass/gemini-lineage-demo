@@ -79,9 +79,9 @@ resource "google_cloudfunctions2_function" "gaacsa" {
     all_traffic_on_latest_revision   = true
     service_account_email            = google_service_account.cloud_function_manage_sa.email
     environment_variables = {
-      "PROJECT_ID" : "${module.project-services.project_id}",
-      "REGION" : "${var.region}"
-      "OUTPUT_BUCKET" : "${google_storage_bucket.data_source.name}"
+      "PROJECT_ID" : module.project-services.project_id,
+      "REGION" : var.region
+      "OUTPUT_BUCKET" : google_storage_bucket.data_source.name
     }
   }
 
