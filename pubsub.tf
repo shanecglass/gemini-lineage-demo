@@ -19,7 +19,25 @@
  * This module also creates the subscription that writes the raw prompts/response data to the appropriate BigQuery table
 */
 
-#Create a service account for Cloud Run authorization
+resource "google_project_service_identity" "pubsub_sa" {
+  provider = google-beta
+
+  project = module.project-services.project_id
+  service = "pubsub.googleapis.com"
+
+  depends_on = [ time_sleep.wait_after_apis ]
+}
+
+resource "google_project_iam_member" "pubsub_sa_auth" {
+  project = module.project-services.project_id
+  for_each = toset([
+    "roles/bigquery.metadataViewer",
+    "roles/bigquery.dataEditor",
+    ]
+  )
+  role   = each.key
+  member = "serviceAccount:${google_project_service_identity.pubsub_sa.email}"
+}
 
 resource "google_pubsub_topic" "topics" {
   for_each = toset(var.resource_purpose)
@@ -28,6 +46,8 @@ resource "google_pubsub_topic" "topics" {
   labels = var.labels
 
   message_retention_duration = "86600s"
+
+  depends_on = [ google_project_service_identity.pubsub_sa ]
 }
 
 resource "google_pubsub_subscription" "subs" {
@@ -41,22 +61,7 @@ resource "google_pubsub_subscription" "subs" {
     table            = "${module.project-services.project_id}.${google_bigquery_dataset.lineage_dataset.dataset_id}.${each.key}"
     use_table_schema = true
   }
+  depends_on = [ google_bigquery_dataset.lineage_dataset, google_pubsub_topic.topics ]
 }
 
-resource "google_project_service_identity" "pubsub_sa" {
-  provider = google-beta
-
-  project = module.project-services.project_id
-  service = "pubsub.googleapis.com"
-}
-
-resource "google_project_iam_member" "pubsub_sa_auth" {
-  project = module.project-services.project_id
-  for_each = toset([
-    "roles/bigquery.metadataViewer",
-    "roles/bigquery.dataEditor",
-  ])
-  role   = each.key
-  member = "serviceAccount:${google_project_service_identity.pubsub_sa.email}"
-}
 
