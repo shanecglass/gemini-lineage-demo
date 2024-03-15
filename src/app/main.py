@@ -1,14 +1,15 @@
 import modules
+import os
 import secrets
 import uuid
 
-
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, flash, request, render_template, redirect, url_for
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm, CSRFProtect
+
 from werkzeug.utils import secure_filename
 
-from wtforms import SubmitField, StringField, FileField
+from wtforms import SubmitField, StringField, FileField, TextAreaField
 from wtforms.validators import DataRequired
 
 app = Flask(__name__, template_folder='./templates')
@@ -35,6 +36,8 @@ class initialInputs(FlaskForm):
         'Enter the email associated with your purchase', validators=[DataRequired()])
     order_number = StringField(
         'Enter your order number', validators=[DataRequired()])
+    additional_notes = TextAreaField(
+        'Enter any additional notes you would like to include')
     submit = SubmitField('Submit')
 
 # Homepage and where most of the work happens. This also calls the API for text generation and embedding, then publishes them to a Pub/Sub topic before directing users to their response
@@ -44,30 +47,36 @@ class initialInputs(FlaskForm):
 def index():
     form = initialInputs()
     if form.validate_on_submit():
-        prompt_tone = form.prompt_tone.data.replace(
+        user_email = form.user_email.data.replace(
             '"', '\"').replace("'", "\'")
-        prompt_purpose = form.prompt_purpose.data.replace(
+        order_number = form.order_number.data.replace(
             '"', '\"').replace("'", "\'")
-        prompt_notes = form.prompt_notes.data.replace(
+        review_text = form.additional_notes.data.replace(
             '"', '\"').replace("'", "\'")
-        input_prompt = f"""
-        Write the body of a marketing email from Cymbal Retail that will {prompt_purpose}.
-        The subject of the email should start with \'Subject:\' and the body of the email should start with \'Body:\'.
-        Write it in the tone of {prompt_tone}.
-        Make sure to incude {prompt_notes}
-        """
-        prompt_embed = modules.get_text_embeddings(input_prompt)
-        modules.publish_prompt_pubsub(session_id, input_prompt, prompt_embed)
-        output = modules.get_response(input_prompt)
-        response_text = output.text.replace("\n", " ").replace("\r", "")
-        safety_attributes = output.safety_attributes
-        response_embed = modules.get_text_embeddings(response_text)
-        modules.publish_response_pubsub(session_id, response_text,
-                                        safety_attributes, response_embed)
-        return redirect(url_for('review', response=response_text))
-    else:
-        message = "Invalid inputs. Try again"
-        return render_template('index.html', form=form)
+        form_data = [user_email, order_number, review_text]
+        model_inputs = modules.get_required_inputs(user_email, order_number)
+        if model_inputs["eligible"][0] is False:
+            return render_template(url_for('ineligible.html'))
+        else:
+            if request.method == 'POST':
+                if 'file' not in request.files:
+                    flash('No file part')
+                    return redirect(request.url)
+                file = request.files['file']
+                # If the user does not select a file, the browser submits an
+                # empty file without a filename.
+                if file.filename == '':
+                    flash('No selected file')
+                    return redirect(request.url)
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    image_path = os.path.join(
+                        app.config['UPLOAD_FOLDER'], filename)
+                    file.save(image_path)
+                modules.call_llm(model_inputs, form_data, image_path)
+                return redirect(url_for('review', response=review))
+            else:
+                return render_template('index.html', form=form)
 
 # Route users to the model response to view their email
 
@@ -77,11 +86,7 @@ def review(response):
     if response is None:
         return render_template('500.html'), 500
     else:
-        x = response.split("Subject:")[1]
-        x = x.split("Body:")
-        email_subject = x[0].strip()
-        email_body = x[1].strip()
-        return render_template('review.html', email_subject=email_subject, email_body=email_body)
+        return render_template('review.html')
 
 # 2 routes to handle common errors
 

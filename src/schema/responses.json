@@ -1,10 +1,5 @@
 [
       {
-        "description": "Original JSON ingested from Pub/Sub",
-        "name": "data",
-        "type": "JSON"
-      },
-      {
         "description": "The timestamp of when the Pub/Sub message was published. This is roughly equivalent to when the user submitted their request",
         "name": "publish_time",
         "type": "TIMESTAMP"

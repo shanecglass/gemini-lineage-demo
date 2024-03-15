@@ -5,11 +5,6 @@
       "type": "STRING"
     },
     {
-      "description": "Original JSON ingested from Pub/Sub",
-      "name": "original_message",
-      "type": "STRING"
-    },
-    {
       "description": "The timestamp of when the Pub/Sub message was published. This is roughly equivalent to when the user submitted their request",
       "name": "publish_time",
       "type": "TIMESTAMP"
@@ -32,7 +27,7 @@
     {
       "description": "Customer service policy used as an input",
       "name": "policy_version",
-      "type": "STRING"
+      "type": "FLOAT"
     },
     {
       "name": "subscription_name",

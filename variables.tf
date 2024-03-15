@@ -87,7 +87,7 @@ variable "public_data_bucket" {
 }
 
 variable "deletion_protection" {
-  type    = string
-  default = false
+  type        = string
+  default     = false
   description = "Whether or not to protect Google Cloud Storage resources from deletion when solution is modified or changed."
 }

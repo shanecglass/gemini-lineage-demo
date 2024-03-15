@@ -24,14 +24,6 @@ data "archive_file" "create_function_zip" {
   depends_on = [time_sleep.wait_after_apis]
 }
 
-#Create a service account for Cloud Run authorization
-resource "google_service_account" "cloud_run_invoke" {
-  project      = module.project-services.project_id
-  account_id   = "demo-app"
-  display_name = "Cloud Run Auth Service Account"
-  depends_on   = [time_sleep.wait_after_apis]
-}
-
 resource "google_service_account" "cloud_function_manage_sa" {
   project      = module.project-services.project_id
   account_id   = "gemini-function-invoke-demo"
@@ -88,7 +80,9 @@ resource "google_cloudfunctions2_function" "gaacsa" {
     service_account_email            = google_service_account.cloud_function_manage_sa.email
     environment_variables = {
       "PROJECT_ID" : "${module.project-services.project_id}",
-    "REGION" : "${var.region}" }
+      "REGION" : "${var.region}"
+      "OUTPUT_BUCKET" : "${google_storage_bucket.data_source}"
+    }
   }
 
   depends_on = [google_project_iam_member.function_manage_roles]

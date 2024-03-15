@@ -12,7 +12,11 @@ visitor==0.1.3
 Werkzeug==2.2.2
 WTForms==3.0.1
 zipp==3.8.1
-google-cloud-aiplatform == 1.28.0
-google-cloud-pubsub == 2.18.0
 futures==3.0.5
-vertexai==0.0.1
+google-cloud-aiplatform
+google-cloud-bigquery
+google-cloud-pubsub
+json_repair == 0.*
+pandas-gbq
+protobuf
+vertexai

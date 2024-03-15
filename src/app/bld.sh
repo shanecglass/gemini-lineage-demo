@@ -1,3 +1,3 @@
 PROJ=${PROJ}
 REGION=${REGION}
-gcloud builds submit --tag "gcr.io/$PROJ/email-marketing-llm"
+gcloud builds submit --tag "gcr.io/$PROJ/gemini-multimodal-demo"
