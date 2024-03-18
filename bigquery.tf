@@ -276,8 +276,8 @@ resource "google_bigquery_routine" "sp_nlp_create" {
   definition_body = templatefile("${path.module}/src/templates/sql/create_models/nlp.sql", {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
-    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     region        = var.multi_region
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     }
   )
   depends_on = [google_project_iam_member.vertex_connection_manage_roles]

@@ -81,7 +81,7 @@ def get_required_inputs(email, order_id):
                     ON
                         users.id = orders.user_id
                 WHERE
-                    email = {email}
+                    email = "{email}"
                     AND orders.created_at BETWEEN TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 DAY) AND CURRENT_TIMESTAMP()
                     AND status = "Returned"
             ) orders,
@@ -93,7 +93,7 @@ def get_required_inputs(email, order_id):
                 FROM
                     `cymbal_sports.order_items`
                 WHERE
-                    order_id = {order_id}
+                    order_id = "{order_id}"
                 GROUP BY
                     order_id, shipped_at, product_id
             ) AS order_details
