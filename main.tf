@@ -89,12 +89,12 @@ data "http" "cloud_run_uri" {
   request_headers = {
     Accept = "application/json"
   Authorization = "Bearer ${data.google_client_config.current.access_token}" }
-  depends_on = [ terraform_data.bld_and_deploy ]
+  depends_on = [terraform_data.bld_and_deploy]
 }
 
 ## Parse out the workflow execution state from the API call response
 locals {
-  response_body  = jsondecode(data.http.cloud_run_uri.response_body)
-  run_uri = local.response_body.uri
+  response_body = jsondecode(data.http.cloud_run_uri.response_body)
+  run_uri       = local.response_body.uri
 }
 

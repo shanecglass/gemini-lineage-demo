@@ -1,4 +1,8 @@
+# Testing files
 *function_test*
+*.tfvars
+template
+tmp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

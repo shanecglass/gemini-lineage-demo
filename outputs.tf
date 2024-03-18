@@ -21,6 +21,6 @@ output "bigquery_editor_url" {
 }
 
 output "cloud_run_app" {
-  value = local.run_uri
+  value       = local.run_uri
   description = "The URL to launch the Cloud Run app"
 }

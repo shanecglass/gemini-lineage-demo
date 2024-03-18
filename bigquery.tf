@@ -35,10 +35,12 @@ resource "google_project_iam_member" "gcs_connection_iam_object_viewer" {
 
 #Create destination dataset for data tables
 resource "google_bigquery_dataset" "infra_dataset" {
-  project    = module.project-services.project_id
-  dataset_id = var.bq_dataset
-  location   = var.multi_region
-  depends_on = [time_sleep.wait_after_apis]
+  project                    = module.project-services.project_id
+  dataset_id                 = var.bq_dataset
+  location                   = var.multi_region
+  delete_contents_on_destroy = var.force_destroy
+  labels                     = var.labels
+  depends_on                 = [time_sleep.wait_after_apis]
 }
 
 ## Create a Biglake table for users
@@ -153,8 +155,8 @@ resource "google_bigquery_table" "inventory_images" {
   external_data_configuration {
     autodetect      = false
     connection_id   = google_bigquery_connection.gcs_connection.name
-    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/inventory_images/*.png"]
-    object_metadata = "Simple"
+    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/inventory-images/*.png"]
+    object_metadata = "SIMPLE"
   }
 
   labels     = var.labels
@@ -171,8 +173,8 @@ resource "google_bigquery_table" "tbl_review_images" {
   external_data_configuration {
     autodetect      = false
     connection_id   = google_bigquery_connection.gcs_connection.name
-    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/review_images/*.png"]
-    object_metadata = "Simple"
+    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/review-images/*.png"]
+    object_metadata = "SIMPLE"
   }
 
   labels     = var.labels
@@ -189,8 +191,8 @@ resource "google_bigquery_table" "service_policy" {
   external_data_configuration {
     autodetect      = false
     connection_id   = google_bigquery_connection.gcs_connection.name
-    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/service_policy/*.png"]
-    object_metadata = "Simple"
+    source_uris     = ["${google_storage_bucket.data_source.url}/cymbal-sports/service-policy/*.png"]
+    object_metadata = "SIMPLE"
   }
 
   labels     = var.labels
@@ -199,10 +201,12 @@ resource "google_bigquery_table" "service_policy" {
 
 #Create destination dataset for prompt and response tables
 resource "google_bigquery_dataset" "lineage_dataset" {
-  project    = module.project-services.project_id
-  dataset_id = "${var.bq_dataset}_lineage"
-  location   = var.multi_region
-  depends_on = [time_sleep.wait_after_apis]
+  project                    = module.project-services.project_id
+  dataset_id                 = "${var.bq_dataset}_lineage"
+  location                   = var.multi_region
+  delete_contents_on_destroy = var.force_destroy
+  labels                     = var.labels
+  depends_on                 = [time_sleep.wait_after_apis]
 }
 
 ## Create landing table for raw prompt and response inputs
@@ -385,7 +389,7 @@ resource "google_bigquery_job" "parse_service_policy" {
     query = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
       project_id = module.project-services.project_id,
       dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
-      table_id = google_bigquery_table.service_policy.table_id
+      table_id   = google_bigquery_table.service_policy.table_id
     })
     create_disposition = ""
     write_disposition  = ""
