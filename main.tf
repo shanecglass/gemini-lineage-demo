@@ -80,4 +80,21 @@ resource "random_id" "id" {
   depends_on  = [time_sleep.wait_after_apis]
 }
 
+data "google_client_config" "current" {
+}
+
+data "http" "cloud_run_uri" {
+  url    = "https://run.googleapis.com/v2/${module.project-services.project_id}/locations/${var.region}/services/gemini-multimodal-demo"
+  method = "GET"
+  request_headers = {
+    Accept = "application/json"
+  Authorization = "Bearer ${data.google_client_config.current.access_token}" }
+  depends_on = [ terraform_data.bld_and_deploy ]
+}
+
+## Parse out the workflow execution state from the API call response
+locals {
+  response_body  = jsondecode(data.http.cloud_run_uri.response_body)
+  run_uri = local.response_body.uri
+}
 
