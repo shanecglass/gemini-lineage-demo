@@ -47,12 +47,12 @@ class initialInputs(FlaskForm):
 def index():
     form = initialInputs()
     if form.validate_on_submit():
-        user_email = form.user_email.data.replace(
-            '"', '\"').replace("'", "\'")
-        order_number = form.order_number.data.replace(
-            '"', '\"').replace("'", "\'")
-        review_text = form.additional_notes.data.replace(
-            '"', '\"').replace("'", "\'")
+        user_email = str(form.user_email.data.replace(
+            '"', '\"').replace("'", "\'"))
+        order_number = str(form.order_number.data.replace(
+            '"', '\"').replace("'", "\'"))
+        review_text = str(form.additional_notes.data.replace(
+            '"', '\"').replace("'", "\'"))
         form_data = [user_email, order_number, review_text]
         model_inputs = modules.get_required_inputs(user_email, order_number)
         if model_inputs["eligible"][0] is False:
