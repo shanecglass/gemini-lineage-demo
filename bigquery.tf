@@ -386,7 +386,7 @@ resource "google_bigquery_routine" "sp_text_parsing_create" {
 
   definition_body = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
     project_id = module.project-services.project_id,
-    dataset_id = google_bigquery_dataset.lineage_dataset.dataset_id,
+    dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
     }
   )
   depends_on = [google_project_iam_member.function_manage_roles,
