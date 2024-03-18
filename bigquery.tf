@@ -379,7 +379,7 @@ resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
 ## Create the stored procedure to parse text from customer service policy
 resource "google_bigquery_job" "parse_service_policy" {
   project = module.project-services.project_id
-  job_id  = "parse_service_policy_${random_id.id}"
+  job_id  = "parse_service_policy_${random_id.id.hex}"
 
   query {
     query = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
