@@ -17,7 +17,7 @@
 
 # Create the notebook files to be uploaded
 resource "local_file" "notebook" {
-  filename = "${path.module}/src/templates/notebook_function/gaacsa_walkthrough.ipynb"
+  filename = "${path.module}/src/templates/notebook_function/notebooks/gaacsa_walkthrough.ipynb"
   content = templatefile("${path.module}/src/templates/gaacsa_walkthrough.ipynb", {
     PROJECT_ID         = format("\\%s${module.project-services.project_id}\\%s", "\"", "\""),
     DATASET_ID         = format("\\%s${google_bigquery_dataset.infra_dataset.dataset_id}\\%s", "\"", "\""),

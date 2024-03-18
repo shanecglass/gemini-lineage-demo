@@ -385,6 +385,7 @@ resource "google_bigquery_job" "parse_service_policy" {
     query = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
       project_id = module.project-services.project_id,
       dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+      table_id = google_bigquery_table.service_policy.table_id
     })
     create_disposition = ""
     write_disposition  = ""

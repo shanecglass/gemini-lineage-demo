@@ -7,7 +7,7 @@ with hold AS(
     *
   FROM
     ML.ANNOTATE_IMAGE(MODEL `${project_id}.${dataset_id}.vision_ai`,
-      TABLE `${project_id}.${dataset_id}.customer_service_policy`,
+      TABLE `${project_id}.${dataset_id}.${table_id}`,
       STRUCT(['DOCUMENT_TEXT_DETECTION'] AS vision_features)) reviews)
 
 SELECT ARRAY_TO_STRING(ARRAY(SELECT TRIM(text_content, "Internal Only For use by Cymbal Sports employees only") FROM hold WHERE page_number > 2 ORDER BY page_number)," ") AS service_policy_text, 1.0 AS version_number

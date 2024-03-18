@@ -84,7 +84,7 @@ data "google_client_config" "current" {
 }
 
 data "http" "cloud_run_uri" {
-  url    = "https://run.googleapis.com/v2/${module.project-services.project_id}/locations/${var.region}/services/gemini-multimodal-demo"
+  url    = "https://run.googleapis.com/v2/projects/${module.project-services.project_id}/locations/${var.region}/services/gemini-multimodal-demo"
   method = "GET"
   request_headers = {
     Accept = "application/json"
