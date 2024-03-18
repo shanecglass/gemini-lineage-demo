@@ -51,7 +51,7 @@ resource "google_project_iam_member" "function_manage_roles" {
 }
 
 resource "google_cloudfunctions2_function" "gaacsa" {
-  project = module.project-services.project_id
+  project     = module.project-services.project_id
   name        = "analyze-reviews"
   location    = "us-central1"
   description = "Gemini as a Customer Service Agent to resolve product issues based on reviews"

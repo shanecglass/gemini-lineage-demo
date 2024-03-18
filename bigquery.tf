@@ -16,7 +16,7 @@
 
 #Create resource connection for GCS
 resource "google_bigquery_connection" "gcs_connection" {
-  project = module.project-services.project_id
+  project       = module.project-services.project_id
   connection_id = "gcs_connection"
   location      = var.multi_region
   friendly_name = "GCS connection"
@@ -223,7 +223,7 @@ resource "google_bigquery_table" "pubsub_dest_tables" {
 
 #Create resource connection for Vertex AI
 resource "google_bigquery_connection" "vertex_connection" {
-  project = module.project-services.project_id
+  project       = module.project-services.project_id
   connection_id = "vertex_ai_connection"
   location      = var.multi_region
   friendly_name = "Vertex AI connection"
@@ -385,11 +385,12 @@ resource "google_bigquery_routine" "sp_text_parsing_create" {
   language     = "SQL"
 
   definition_body = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
-    project_id    = module.project-services.project_id,
-    dataset_id    = google_bigquery_dataset.lineage_dataset.dataset_id,
+    project_id = module.project-services.project_id,
+    dataset_id = google_bigquery_dataset.lineage_dataset.dataset_id,
     }
   )
   depends_on = [google_project_iam_member.function_manage_roles,
-    google_project_iam_member.vertex_connection_manage_roles
+    google_project_iam_member.vertex_connection_manage_roles,
+    google_bigquery_routine.sp_vision_ai_create
   ]
 }
