@@ -3,7 +3,7 @@ AS
 with hold AS(
   SELECT
     REGEXP_REPLACE(REGEXP_REPLACE(JSON_VALUE(ml_annotate_image_result.full_text_annotation.text), r'\n', ' '), r'•|●', '') AS text_content,
-    CAST(REGEXP_EXTRACT(uri, r'^gs\:\/\/customer-service-policy-us/images/Cymbal Sports Customer Service Policy_Page_([0-9]{2})\.jpg$') AS INT64) AS page_number,
+    CAST(REGEXP_EXTRACT(uri, r'^gs\:\/\/customer-service-policy-us/images/Cymbal Sports Customer Service Policy_Page_([0-9]{2})\.png$') AS INT64) AS page_number,
     *
   FROM
     ML.ANNOTATE_IMAGE(MODEL `${project_id}.${dataset_id}.vision_ai`,

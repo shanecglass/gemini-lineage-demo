@@ -91,7 +91,8 @@ create_tables:
                     3: $${"CALL `"+project_id+"."+dataset_id+".sp_vision_ai_create`();"}
                     4: $${"CALL `"+project_id+"."+dataset_id+".sp_nlp_create`();"}
                     5: $${"CALL `"+project_id+"."+dataset_id+".sp_translate_create`();"}
-                    6: $${"CALL `"+project_id+"."+lineage_dataset_id+".sp_remote_function_create`();"}
+                    6: $${"CALL `"+project_id+"."+dataset_id+".sp_text_parsing_create`();"}
+                    7: $${"CALL `"+project_id+"."+lineage_dataset_id+".sp_remote_function_create`();"}
         - loopStepTables:
             for:
                 value: key
