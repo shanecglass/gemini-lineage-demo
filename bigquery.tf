@@ -350,7 +350,7 @@ resource "google_bigquery_routine" "sp_remote_function_create" {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.lineage_dataset.dataset_id,
     region        = var.multi_region,
-    connection_id = google_bigquery_connection.vertex_connection.name,
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
     function_url  = google_cloudfunctions2_function.gaacsa.url,
     }
   )
@@ -386,8 +386,8 @@ resource "google_bigquery_job" "parse_service_policy" {
       project_id = module.project-services.project_id,
       dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
     })
-    create_disposition = "CREATE_IF_NEEDED"
-    write_disposition  = "WRITE_TRUNCATE"
+    create_disposition = ""
+    write_disposition  = ""
     use_legacy_sql     = false
   }
   depends_on = [google_project_iam_member.function_manage_roles,
