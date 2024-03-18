@@ -40,6 +40,7 @@ resource "google_project_iam_member" "pubsub_sa_auth" {
 }
 
 resource "google_pubsub_topic" "topics" {
+  project = module.project-services.project_id
   for_each = toset(var.resource_purpose)
   name     = "gemini-multimodal-demo${each.key}"
 
@@ -51,7 +52,7 @@ resource "google_pubsub_topic" "topics" {
 }
 
 resource "google_pubsub_subscription" "subs" {
-  provider = google
+  project = module.project-services.project_id
   for_each = toset(var.resource_purpose)
   topic    = google_pubsub_topic.topics[each.key].name
   name     = "write-to-bq-${each.key}"
