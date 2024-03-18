@@ -377,20 +377,22 @@ resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
 }
 
 ## Create the stored procedure to parse text from customer service policy
-resource "google_bigquery_routine" "sp_text_parsing_create" {
+resource "google_bigquery_job" "parse_service_policy" {
   project      = module.project-services.project_id
-  dataset_id   = google_bigquery_dataset.lineage_dataset.dataset_id
-  routine_id   = "sp_text_parsing_create"
-  routine_type = "PROCEDURE"
-  language     = "SQL"
+  job_id = "parse_service_policy_${random_id.id}"
 
-  definition_body = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
-    project_id = module.project-services.project_id,
-    dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
-    }
-  )
+  query {
+    query = templatefile("${path.module}/src/templates/sql/doc_parsing/parse_text.sql", {
+      project_id = module.project-services.project_id,
+      dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+    })
+    create_disposition = CREATE_IF_NEEDED
+    write_disposition = WRITE_TRUNCATE
+    use_legacy_sql = false
+  }
   depends_on = [google_project_iam_member.function_manage_roles,
     google_project_iam_member.vertex_connection_manage_roles,
-    google_bigquery_routine.sp_vision_ai_create
+    google_bigquery_routine.sp_vision_ai_create,
+    module.workflow_polling_4
   ]
 }
