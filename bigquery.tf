@@ -16,6 +16,7 @@
 
 #Create resource connection for GCS
 resource "google_bigquery_connection" "gcs_connection" {
+  project = module.project-services.project_id
   connection_id = "gcs_connection"
   location      = var.multi_region
   friendly_name = "GCS connection"
