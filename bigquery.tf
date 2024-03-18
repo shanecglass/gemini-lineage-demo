@@ -223,6 +223,7 @@ resource "google_bigquery_table" "pubsub_dest_tables" {
 
 #Create resource connection for Vertex AI
 resource "google_bigquery_connection" "vertex_connection" {
+  project = module.project-services.project_id
   connection_id = "vertex_ai_connection"
   location      = var.multi_region
   friendly_name = "Vertex AI connection"
