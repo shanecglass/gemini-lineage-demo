@@ -42,7 +42,7 @@ resource "google_project_iam_member" "pubsub_sa_auth" {
 resource "google_pubsub_topic" "topics" {
   project  = module.project-services.project_id
   for_each = toset(var.resource_purpose)
-  name     = "gemini-multimodal-demo${each.key}"
+  name     = "gemini-multimodal-demo-${each.key}"
 
   labels = var.labels
 
