@@ -25,7 +25,7 @@ resource "google_project_iam_member" "cloud_run_invoke_roles" {
     "roles/aiplatform.serviceAgent", // Service account role
     "roles/iam.serviceAccountUser",
     "roles/bigquery.admin",      // Create jobs and modify BigQuery tables
-    "roles/storage.objectAdmin", // Read/write GCS files
+    "roles/storage.admin", // Read/write GCS files
     "roles/iam.serviceAccountTokenCreator",
     ]
   )
@@ -54,6 +54,7 @@ resource "terraform_data" "bld_and_deploy" {
     environment = {
       PROJECT_ID = module.project-services.project_id
       REGION     = var.region
+      OUTPUT_BUCKET = google_storage_bucket.data_source.url
     }
   }
   depends_on = [google_project_iam_member.cloud_run_invoke_roles]

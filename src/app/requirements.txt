@@ -20,3 +20,4 @@ json_repair == 0.*
 pandas-gbq
 protobuf
 vertexai
+Flask-Reuploaded

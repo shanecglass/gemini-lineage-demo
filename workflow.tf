@@ -70,7 +70,7 @@ resource "google_workflows_workflow" "setup_workflow" {
     google_bigquery_table.tbl_review_images,
     google_bigquery_routine.sp_remote_function_create,
     google_bigquery_connection.gcs_connection,
-    google_bigquery_routine.sp_raw_reviews_joined_create,
+    google_bigquery_job.raw_reviews_join,
     google_bigquery_routine.sp_translate_create,
     google_bigquery_routine.sp_vision_ai_create,
     google_bigquery_routine.sp_nlp_create,

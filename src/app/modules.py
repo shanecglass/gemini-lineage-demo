@@ -1,5 +1,5 @@
 # This file will get executed when the function is executed
-import google.cloud.storage as gcs
+# import google.cloud.storage as gcs
 import json
 import json_repair
 import os
@@ -107,7 +107,7 @@ def get_required_inputs(email, order_id):
         )
 
         SELECT
-            IF((orders_returned < 5 AND order_total < 50 AND shipping_date > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 DAY)), true, false) AS eligible,
+            IF((orders_returned < 5 AND order_total < 50 AND shipping_date > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 DAY)), "True", "False") AS eligible,
             product_id,
             service_policy_text,
             policy_version.latest AS policy_version,
@@ -119,14 +119,19 @@ def get_required_inputs(email, order_id):
     return variables_df
 
 
-def upload_to_gcs(source_file_name, destination_blob_name):
-    output_bucket_name = os.environ.get["OUTPUT_BUCKET"]
-    client = gcs.Client()
-    bucket = client.bucket(output_bucket_name)
-    blob = bucket.blob(f"review-images/{destination_blob_name}")
-    blob.upload_from_filename(source_file_name)
-    print(f"gs://{output_bucket_name}/{destination_blob_name}")
-    return f"gs://{output_bucket_name}/{destination_blob_name}"
+# def upload_to_gcs(source_file_name, destination_blob_name):
+#     output_bucket_name = os.environ['OUTPUT_BUCKET']
+#     client = gcs.Client()
+#     print(client)
+#     bucket = client.bucket(output_bucket_name)
+#     print(bucket)
+#     blob_name = f"cymbal-sports/review-images/uploads/{destination_blob_name}"
+#     blob = bucket.blob(blob_name)
+#     print(f"Blob is: {blob}")
+#     with open(source_file_name, "rb") as source_file:
+#         blob.upload_from_file(source_file, client=client)
+#     print(f"gs://{output_bucket_name}/blob_name")
+#     return (f"gs://{output_bucket_name}/blob_name")
 
 
 def get_response(model_version, prompt):
@@ -207,14 +212,14 @@ def call_llm(inputs,
         inventory_image = None
     else:
         inventory_image = Part.from_uri(
-            inventory_image_uri, mime_type="image/jpeg")
+            inventory_image_uri, mime_type="image/png")
 
     review_text = form_fields[2]
-    order_number = form_fields[1]
+    # order_number = form_fields[1]
     # email = form_fields[0]
 
-    review_image_uri = upload_to_gcs(
-        review_image_path, f"{order_number}_{product_id}.png")
+    # review_image_uri = upload_to_gcs(
+    #     review_image_path, f"{order_number}_{product_id}.png")
     review_image = Image.load_from_file(review_image_path)
 
     context = f"""
@@ -246,20 +251,20 @@ def call_llm(inputs,
 
     if review_image is None:
         prompt = [context, None, inventory_image]
-        embed_inputs = [context, None, inventory_image_uri]
+        # embed_inputs = [context, None, inventory_image_uri]
     else:
         prompt = [context, review_image, inventory_image]
-        embed_inputs = [context, review_image_uri, inventory_image_uri]
+        # embed_inputs = [context, review_image_uri, inventory_image_uri]
 
-    prompt_embeddings = get_embeddings(embed_inputs)
-    review_embeddings = get_text_embeddings(review_text)
-    publish_prompt_pubsub(
-        review_embeddings,
-        context,
-        prompt_embeddings[0],
-        prompt_embeddings[1],
-        model_version,
-        policy_version)
+    # prompt_embeddings = get_embeddings(embed_inputs)
+    # review_embeddings = get_text_embeddings(review_text)
+    # publish_prompt_pubsub(
+    #     review_embeddings,
+    #     context,
+    #     prompt_embeddings[0],
+    #     prompt_embeddings[1],
+    #     model_version,
+    #     policy_version)
 
     output = get_response(model_version, prompt)
 

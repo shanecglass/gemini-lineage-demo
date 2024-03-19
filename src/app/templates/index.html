@@ -11,7 +11,7 @@
 
 
 {% block title %}
-Email Marketing Copy Generator
+Cymbal Sports Return Portal
 {% endblock %}
 
 
@@ -23,7 +23,7 @@ Email Marketing Copy Generator
 
       <h1 class="pt-5 pb-2">Welcome to the Cymbal Sports Return Portal!</h1>
 
-      <p class="lead">Hey there Champ! This form uses a <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini">Gemini</a>, BigQuery Continuous Queries, and other Google Cloud products
+      <p class="lead">Hey there Champ! This form uses <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini">Gemini</a>, BigQuery Continuous Queries, and other Google Cloud products
       to process returns for defective items.</p>
       <p><b>How to use this app</b></p>
       <p><ol>
@@ -31,8 +31,8 @@ Email Marketing Copy Generator
         <li>Click "Submit"</li>
       </ol></p>
 
-      {{ render_form(form) }}
-      {{ form.crsf_token }}
+        {{ render_form(form, enctype="multipart/form-data") }}
+        {{ form.csrf_token }}
 
       <p class="pt-5"><strong>{{ message }}</strong></p>
 

@@ -27,8 +27,14 @@ resource "google_bigquery_connection" "gcs_connection" {
 
 resource "google_project_iam_member" "gcs_connection_iam_object_viewer" {
   project = module.project-services.project_id
-  role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${google_bigquery_connection.gcs_connection.cloud_resource[0].service_account_id}"
+  for_each = toset([
+    "roles/storage.objectViewer",
+    "roles/bigquery.connectionUser",
+    "roles/serviceusage.serviceUsageConsumer",
+    "roles/bigquery.dataEditor"
+  ])
+  role   = each.key
+  member = "serviceAccount:${google_bigquery_connection.gcs_connection.cloud_resource[0].service_account_id}"
 
   depends_on = [google_storage_bucket.data_source, google_bigquery_connection.gcs_connection]
 }
@@ -324,25 +330,6 @@ resource "google_bigquery_routine" "sp_translate_create" {
 }
 
 ## Create the raw_reviews_joined table stored procedure
-resource "google_bigquery_routine" "sp_raw_reviews_joined_create" {
-  project      = module.project-services.project_id
-  dataset_id   = google_bigquery_dataset.infra_dataset.dataset_id
-  routine_id   = "sp_raw_reviews_joined_create"
-  routine_type = "PROCEDURE"
-  language     = "SQL"
-
-  definition_body = templatefile("${path.module}/src/templates/sql/join_with_review_images.sql", {
-    project_id        = module.project-services.project_id,
-    dataset_id        = google_bigquery_dataset.infra_dataset.dataset_id,
-    raw_reviews_table = google_bigquery_table.tbl_raw_reviews.table_id,
-    object_table      = google_bigquery_table.tbl_review_images.table_id,
-    region            = var.multi_region
-    }
-  )
-  depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
-}
-
-## Create the raw_reviews_joined table stored procedure
 resource "google_bigquery_routine" "sp_remote_function_create" {
   project      = module.project-services.project_id
   dataset_id   = google_bigquery_dataset.lineage_dataset.dataset_id
@@ -380,6 +367,26 @@ resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
   depends_on = [google_bigquery_table.pubsub_dest_tables]
 }
 
+## Create the raw_reviews_joined table stored procedure
+resource "google_bigquery_job" "raw_reviews_join" {
+  project = module.project-services.project_id
+  job_id  = "raw_reviews_join_${random_id.id.hex}"
+
+  query {
+    query = templatefile("${path.module}/src/templates/sql/join_with_review_images.sql", {
+      project_id        = module.project-services.project_id,
+      dataset_id        = google_bigquery_dataset.infra_dataset.dataset_id,
+      raw_reviews_table = google_bigquery_table.tbl_raw_reviews.table_id,
+      object_table      = google_bigquery_table.tbl_review_images.table_id,
+      }
+    )
+    create_disposition = ""
+    write_disposition  = ""
+    use_legacy_sql     = false
+  }
+  depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
+}
+
 ## Create the stored procedure to parse text from customer service policy
 resource "google_bigquery_job" "parse_service_policy" {
   project = module.project-services.project_id
@@ -390,6 +397,7 @@ resource "google_bigquery_job" "parse_service_policy" {
       project_id = module.project-services.project_id,
       dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
       table_id   = google_bigquery_table.service_policy.table_id
+      gcs_bucket = google_storage_bucket.data_source.name,
     })
     create_disposition = ""
     write_disposition  = ""
