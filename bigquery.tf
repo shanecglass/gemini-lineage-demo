@@ -384,7 +384,7 @@ resource "google_bigquery_job" "raw_reviews_join" {
     write_disposition  = ""
     use_legacy_sql     = false
   }
-  depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
+  depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer, module.workflow_polling_4]
 }
 
 ## Create the stored procedure to parse text from customer service policy
