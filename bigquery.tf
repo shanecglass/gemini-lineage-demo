@@ -246,6 +246,7 @@ resource "google_bigquery_connection" "vertex_connection" {
 resource "google_project_iam_member" "vertex_connection_manage_roles" {
   for_each = toset([
     "roles/aiplatform.user",
+    "roles/cloudtranslate.user",
     "roles/bigquery.connectionUser",
     "roles/serviceusage.serviceUsageConsumer",
     ]
@@ -257,15 +258,33 @@ resource "google_project_iam_member" "vertex_connection_manage_roles" {
   depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer]
 }
 
-## Create Bigquery ML Model for using text generation
-resource "google_bigquery_routine" "sp_bigqueryml_generate_create" {
+## Create Bigquery ML Model for using text generation from Gemini Pro
+resource "google_bigquery_routine" "sp_text_generate_create" {
   project      = module.project-services.project_id
   dataset_id   = google_bigquery_dataset.infra_dataset.dataset_id
-  routine_id   = "sp_generate_create"
+  routine_id   = "sp_text_generate_create"
   routine_type = "PROCEDURE"
   language     = "SQL"
 
   definition_body = templatefile("${path.module}/src/templates/sql/create_models/generate_text.sql", {
+    project_id    = module.project-services.project_id,
+    dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
+    region        = var.multi_region
+    connection_id = google_bigquery_connection.vertex_connection.connection_id,
+    }
+  )
+  depends_on = [google_project_iam_member.vertex_connection_manage_roles]
+}
+
+## Create Bigquery ML Model for using text generation from Gemini Vision Pro
+resource "google_bigquery_routine" "sp_create_vision_pro" {
+  project      = module.project-services.project_id
+  dataset_id   = google_bigquery_dataset.infra_dataset.dataset_id
+  routine_id   = "sp_create_vision_pro"
+  routine_type = "PROCEDURE"
+  language     = "SQL"
+
+  definition_body = templatefile("${path.module}/src/templates/sql/create_models/generate_vision_pro.sql", {
     project_id    = module.project-services.project_id,
     dataset_id    = google_bigquery_dataset.infra_dataset.dataset_id,
     region        = var.multi_region
@@ -354,7 +373,7 @@ resource "google_bigquery_routine" "sp_remote_function_create" {
 resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
   for_each     = toset(var.resource_purpose)
   project      = module.project-services.project_id
-  dataset_id   = google_bigquery_dataset.infra_dataset.dataset_id
+  dataset_id   = google_bigquery_dataset.lineage_dataset.dataset_id
   routine_id   = "sp_${each.key}_cleaning_create"
   routine_type = "PROCEDURE"
   language     = "SQL"
@@ -366,6 +385,27 @@ resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
   )
   depends_on = [google_bigquery_table.pubsub_dest_tables]
 }
+
+## Create the stored procedure to create the cleaned prompt lineage table
+resource "google_bigquery_routine" "sp_bigqueryml_model" {
+  project      = module.project-services.project_id
+  dataset_id   = google_bigquery_dataset.marketing_dataset.dataset_id
+  routine_id   = "sp_bigqueryml_model"
+  routine_type = "PROCEDURE"
+  language     = "SQL"
+
+  definition_body = templatefile("${path.module}/src/templates/sql/bqml_model.sql", {
+    project_id = module.project-services.project_id,
+    infra_dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+    marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
+    }
+  )
+  depends_on = [
+    google_bigquery_dataset.marketing_dataset,
+    google_project_iam_member.vertex_connection_manage_roles
+  ]
+}
+
 
 ## Create the raw_reviews_joined table stored procedure
 resource "google_bigquery_job" "raw_reviews_join" {
@@ -387,7 +427,17 @@ resource "google_bigquery_job" "raw_reviews_join" {
   depends_on = [google_project_iam_member.gcs_connection_iam_object_viewer, module.workflow_polling_4]
 }
 
-## Create the stored procedure to parse text from customer service policy
+#Create destination dataset for data tables
+resource "google_bigquery_dataset" "marketing_dataset" {
+  project                    = module.project-services.project_id
+  dataset_id                 = "${var.bq_dataset}_marketing"
+  location                   = var.multi_region
+  delete_contents_on_destroy = var.force_destroy
+  labels                     = var.labels
+  depends_on                 = [time_sleep.wait_after_apis]
+}
+
+## Create the BigQuery job to parse text from customer service policy
 resource "google_bigquery_job" "parse_service_policy" {
   project = module.project-services.project_id
   job_id  = "parse_service_policy_${random_id.id.hex}"
@@ -407,5 +457,50 @@ resource "google_bigquery_job" "parse_service_policy" {
     google_project_iam_member.vertex_connection_manage_roles,
     google_bigquery_routine.sp_vision_ai_create,
     module.workflow_polling_4
+  ]
+}
+
+## Create the BigQuery job create the customer personas table
+resource "google_bigquery_job" "customer_personas" {
+  project = module.project-services.project_id
+  job_id  = "customer_personas_${random_id.id.hex}"
+
+  query {
+    query = templatefile("${path.module}/src/templates/sql/customer_personas.sql", {
+      project_id = module.project-services.project_id,
+      infra_dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+      marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
+      }
+    )
+    create_disposition = ""
+    write_disposition  = ""
+    use_legacy_sql     = false
+  }
+  depends_on = [
+    google_project_iam_member.vertex_connection_manage_roles,
+    module.workflow_polling_4,
+    google_bigquery_routine.sp_bigqueryml_model,
+    google_bigquery_routine.sp_text_generate_create
+  ]
+}
+
+## Create the stored procedure to create the final email output
+resource "google_bigquery_routine" "sp_generate_email" {
+  project      = module.project-services.project_id
+  dataset_id   = google_bigquery_dataset.marketing_dataset.dataset_id
+  routine_id   = "sp_generate_email"
+  routine_type = "PROCEDURE"
+  language     = "SQL"
+
+  definition_body = templatefile("${path.module}/src/templates/sql/generate_email.sql", {
+    project_id = module.project-services.project_id,
+    infra_dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+    marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
+    }
+  )
+   depends_on = [
+    module.workflow_polling_4,
+    google_bigquery_job.customer_personas,
+    google_bigquery_routine.sp_text_generate_create
   ]
 }

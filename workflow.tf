@@ -59,6 +59,7 @@ resource "google_workflows_workflow" "setup_workflow" {
     raw_bucket         = google_storage_bucket.data_source.name
     dataset_id         = google_bigquery_dataset.infra_dataset.dataset_id
     lineage_dataset_id = google_bigquery_dataset.lineage_dataset.dataset_id,
+    marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
     function_url       = google_cloudfunctions2_function.notebook_deploy_function.url
     function_name      = google_cloudfunctions2_function.notebook_deploy_function.name
   })
@@ -70,10 +71,11 @@ resource "google_workflows_workflow" "setup_workflow" {
     google_bigquery_table.tbl_review_images,
     google_bigquery_routine.sp_remote_function_create,
     google_bigquery_connection.gcs_connection,
+    google_bigquery_routine.sp_bigqueryml_model,
     google_bigquery_routine.sp_translate_create,
     google_bigquery_routine.sp_vision_ai_create,
     google_bigquery_routine.sp_nlp_create,
-    google_bigquery_routine.sp_bigqueryml_generate_create,
+    google_bigquery_routine.sp_text_generate_create,
     time_sleep.wait_after_function,
     google_storage_bucket.data_source,
     google_project_iam_member.pubsub_sa_auth,
@@ -82,8 +84,8 @@ resource "google_workflows_workflow" "setup_workflow" {
 }
 
 module "workflow_polling_1" {
-  source = "./workflow_polling"
-  workflow_id          = google_workflows_workflow.setup_workflow.id
+  source      = "./workflow_polling"
+  workflow_id = google_workflows_workflow.setup_workflow.id
 
   input_workflow_state = null
 

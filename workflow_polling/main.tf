@@ -64,10 +64,10 @@ output "workflow_state" {
   value       = local.workflow_state
 }
 
-## If workflow execution is actively running, sleep for 90 seconds to allow it to finish
+## If workflow execution is actively running, sleep for 120 seconds to allow it to finish
 ## If not, exit as quickly as possible (1 second)
 resource "time_sleep" "complete_workflow" {
-  create_duration = local.workflow_state == "ACTIVE" ? "90s" : "1s"
+  create_duration = local.workflow_state == "ACTIVE" ? "120s" : "1s"
   depends_on = [
     data.http.call_workflows_setup,
     time_sleep.workflow_execution_wait,

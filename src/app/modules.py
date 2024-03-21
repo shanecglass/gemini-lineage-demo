@@ -6,7 +6,7 @@ import os
 import vertexai
 import pandas_gbq
 
-from google.cloud import pubsub_v1
+from google.cloud import pubsub_v1, storage as gcs
 from vertexai import generative_models
 from vertexai.generative_models import GenerativeModel, Image, Part
 from vertexai.language_models import TextEmbeddingModel
@@ -119,19 +119,18 @@ def get_required_inputs(email, order_id):
     return variables_df
 
 
-# def upload_to_gcs(source_file_name, destination_blob_name):
-#     output_bucket_name = os.environ['OUTPUT_BUCKET']
-#     client = gcs.Client()
-#     print(client)
-#     bucket = client.bucket(output_bucket_name)
-#     print(bucket)
-#     blob_name = f"cymbal-sports/review-images/uploads/{destination_blob_name}"
-#     blob = bucket.blob(blob_name)
-#     print(f"Blob is: {blob}")
-#     with open(source_file_name, "rb") as source_file:
-#         blob.upload_from_file(source_file, client=client)
-#     print(f"gs://{output_bucket_name}/blob_name")
-#     return (f"gs://{output_bucket_name}/blob_name")
+def upload_to_gcs(source_file_name, destination_blob_name):
+    output_bucket_name = os.environ['OUTPUT_BUCKET']
+    client = gcs.Client()
+    print(client)
+    bucket = client.bucket(output_bucket_name)
+    print(bucket)
+    blob_name = f"cymbal-sports/review-images/uploads/{destination_blob_name}"
+    blob = bucket.blob(blob_name)
+    print(f"Blob is: {blob}")
+    blob.upload_from_filename(source_file_name, client=client)
+    print(f"gs://{output_bucket_name}/blob_name")
+    return (f"gs://{output_bucket_name}/blob_name")
 
 
 def get_response(model_version, prompt):
@@ -215,11 +214,11 @@ def call_llm(inputs,
             inventory_image_uri, mime_type="image/png")
 
     review_text = form_fields[2]
-    # order_number = form_fields[1]
+    order_number = form_fields[1]
     # email = form_fields[0]
 
-    # review_image_uri = upload_to_gcs(
-    #     review_image_path, f"{order_number}_{product_id}.png")
+    review_image_uri = upload_to_gcs(
+        review_image_path, f"{order_number}_{product_id}.png")
     review_image = Image.load_from_file(review_image_path)
 
     context = f"""
@@ -242,29 +241,29 @@ def call_llm(inputs,
                 Do not include JSON decorator.
 
                 This is an example of an output that is correctly formatted:
-                {{
+                {
                     "issue_resolution": "This item did not meet our quality standards. Offer the customer the option to choose either a replacement or a refund.",
                     "response_email": "Hello! Thank you for contacting us about your negative experience with our leggings. We are sorry to hear that the fabric was so thin that you could see your panties. We are also sorry to hear that they formed dots after just a few washes. We would like to offer you a refund or replacement for your purchase. You can reach us by phone at 1-800-555-1212 or by email at [email protected] Thank you for your understanding."
-                }}
+                }
                 """
     model_version = "gemini-1.0-pro-vision"
 
     if review_image is None:
         prompt = [context, None, inventory_image]
-        # embed_inputs = [context, None, inventory_image_uri]
+        embed_inputs = [context, None, inventory_image_uri]
     else:
         prompt = [context, review_image, inventory_image]
-        # embed_inputs = [context, review_image_uri, inventory_image_uri]
+        embed_inputs = [context, review_image_uri, inventory_image_uri]
 
-    # prompt_embeddings = get_embeddings(embed_inputs)
-    # review_embeddings = get_text_embeddings(review_text)
-    # publish_prompt_pubsub(
-    #     review_embeddings,
-    #     context,
-    #     prompt_embeddings[0],
-    #     prompt_embeddings[1],
-    #     model_version,
-    #     policy_version)
+    prompt_embeddings = get_embeddings(embed_inputs)
+    review_embeddings = get_text_embeddings(review_text)
+    publish_prompt_pubsub(
+        review_embeddings,
+        context,
+        prompt_embeddings[0],
+        prompt_embeddings[1],
+        model_version,
+        policy_version)
 
     output = get_response(model_version, prompt)
 

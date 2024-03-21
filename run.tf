@@ -12,6 +12,7 @@ resource "google_service_account" "cloud_run_invoke" {
   project      = module.project-services.project_id
   account_id   = "gemini-demo-app"
   display_name = "Cloud Run Auth Service Account"
+  create_ignore_already_exists = var.create_ignore_service_accounts
   depends_on = [
   google_project_service_identity.cloud_run]
 }
@@ -24,8 +25,8 @@ resource "google_project_iam_member" "cloud_run_invoke_roles" {
     "roles/aiplatform.user",         // Needs to predict from endpoints
     "roles/aiplatform.serviceAgent", // Service account role
     "roles/iam.serviceAccountUser",
-    "roles/bigquery.admin",      // Create jobs and modify BigQuery tables
-    "roles/storage.admin", // Read/write GCS files
+    "roles/bigquery.admin", // Create jobs and modify BigQuery tables
+    "roles/storage.admin",  // Read/write GCS files
     "roles/iam.serviceAccountTokenCreator",
     ]
   )
@@ -44,16 +45,14 @@ resource "terraform_data" "bld_and_deploy" {
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = <<-EOT
-      cd "${path.root}/src/app"
-      chmod +x bld.sh
-      chmod +x deploy.sh
+      cd "${path.module}/src/app"
       bash bld.sh
       bash deploy.sh
     EOT
 
     environment = {
-      PROJECT_ID = module.project-services.project_id
-      REGION     = var.region
+      PROJECT_ID    = module.project-services.project_id
+      REGION        = var.region
       OUTPUT_BUCKET = google_storage_bucket.data_source.url
     }
   }

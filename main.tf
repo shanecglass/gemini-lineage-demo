@@ -28,6 +28,7 @@ module "project-services" {
     "bigqueryconnection.googleapis.com",
     "bigquerystorage.googleapis.com",
     "cloudapis.googleapis.com",
+    "cloudbuild.googleapis.com",
     "cloudfunctions.googleapis.com",
     "compute.googleapis.com",
     "config.googleapis.com",

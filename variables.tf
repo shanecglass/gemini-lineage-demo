@@ -91,3 +91,9 @@ variable "deletion_protection" {
   default     = false
   description = "Whether or not to protect Google Cloud Storage resources from deletion when solution is modified or changed."
 }
+
+variable "create_ignore_service_accounts" {
+  type = bool
+  default = true
+  description = "If set to true, skip service account creation if a service account with the same email already exists."
+}
