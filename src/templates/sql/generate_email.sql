@@ -91,7 +91,7 @@ SELECT
 
 
 (SELECT
-  'You are an email marketing expert for Cymbal Sports, an eCommerce sporting goods retailer. Rewrite the product description for the product in this image. The new description should be written to appeal to . You are writing a message to a customer named ' || hold.first_name || ' ' || hold.last_name || ' who is a ' || hold.age || ' year old male who lives in state: ' || hold.state || ' and country ' || hold.country || '. Their customer persona_name is ' || hold.persona_title || ' . Their persona_description is: ' || hold.persona_description || ' The original product description is ' || hold.product_1_description
+  'You are a marketing expert for Cymbal Sports, an eCommerce sporting goods retailer. Rewrite the product description for the product in this image. The new description should be written to appeal to . You are writing a message to a customer named ' || hold.first_name || ' ' || hold.last_name || ' who is a ' || hold.age || ' year old male who lives in state: ' || hold.state || ' and country ' || hold.country || '. Their customer persona_name is ' || hold.persona_title || ' . Their persona_description is: ' || hold.persona_description || ' The original product description is ' || hold.product_1_description
 FROM
   hold)
 );
