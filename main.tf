@@ -97,5 +97,6 @@ data "http" "cloud_run_uri" {
 locals {
   response_body = jsondecode(data.http.cloud_run_uri.response_body)
   run_uri       = local.response_body.uri
+  depends_on    = [data.http.cloud_run_uri]
 }
 

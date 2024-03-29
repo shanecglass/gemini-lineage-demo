@@ -56,12 +56,12 @@ resource "google_workflows_workflow" "setup_workflow" {
   service_account = google_service_account.workflow_service_account.id
 
   source_contents = templatefile("${path.module}/src/templates/workflow.tftpl", {
-    raw_bucket         = google_storage_bucket.data_source.name
-    dataset_id         = google_bigquery_dataset.infra_dataset.dataset_id
-    lineage_dataset_id = google_bigquery_dataset.lineage_dataset.dataset_id,
+    raw_bucket           = google_storage_bucket.data_source.name
+    dataset_id           = google_bigquery_dataset.infra_dataset.dataset_id
+    lineage_dataset_id   = google_bigquery_dataset.lineage_dataset.dataset_id,
     marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
-    function_url       = google_cloudfunctions2_function.notebook_deploy_function.url
-    function_name      = google_cloudfunctions2_function.notebook_deploy_function.name
+    function_url         = google_cloudfunctions2_function.notebook_deploy_function.url
+    function_name        = google_cloudfunctions2_function.notebook_deploy_function.name
   })
 
   depends_on = [

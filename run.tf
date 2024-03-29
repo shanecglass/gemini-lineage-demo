@@ -9,9 +9,9 @@ resource "google_project_service_identity" "cloud_run" {
 
 #Create a service account for Cloud Run authorization
 resource "google_service_account" "cloud_run_invoke" {
-  project      = module.project-services.project_id
-  account_id   = "gemini-demo-app"
-  display_name = "Cloud Run Auth Service Account"
+  project                      = module.project-services.project_id
+  account_id                   = "gemini-demo-app"
+  display_name                 = "Cloud Run Auth Service Account"
   create_ignore_already_exists = var.create_ignore_service_accounts
   depends_on = [
   google_project_service_identity.cloud_run]
@@ -53,7 +53,7 @@ resource "terraform_data" "bld_and_deploy" {
     environment = {
       PROJECT_ID    = module.project-services.project_id
       REGION        = var.region
-      OUTPUT_BUCKET = google_storage_bucket.data_source.url
+      OUTPUT_BUCKET = google_storage_bucket.data_source.name
     }
   }
   depends_on = [google_project_iam_member.cloud_run_invoke_roles]

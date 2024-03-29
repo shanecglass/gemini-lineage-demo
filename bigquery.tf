@@ -28,6 +28,7 @@ resource "google_bigquery_connection" "gcs_connection" {
 resource "google_project_iam_member" "gcs_connection_iam_object_viewer" {
   project = module.project-services.project_id
   for_each = toset([
+    "roles/aiplatform.user",
     "roles/storage.objectViewer",
     "roles/bigquery.connectionUser",
     "roles/serviceusage.serviceUsageConsumer",
@@ -216,11 +217,11 @@ resource "google_bigquery_dataset" "lineage_dataset" {
 }
 
 ## Create landing table for raw prompt and response inputs
-resource "google_bigquery_table" "pubsub_dest_tables" {
-  for_each            = toset(var.resource_purpose)
+resource "google_bigquery_table" "pubsub_refunds_dest_tables" {
+  for_each            = toset(var.refund_resource_purpose)
   project             = module.project-services.project_id
   dataset_id          = google_bigquery_dataset.lineage_dataset.dataset_id
-  table_id            = each.key
+  table_id            = "refunds_${each.key}"
   deletion_protection = false
 
   time_partitioning {
@@ -228,8 +229,25 @@ resource "google_bigquery_table" "pubsub_dest_tables" {
     type  = "HOUR"
   }
 
-  schema = file("${path.module}/src/schema/${each.key}.json")
+  schema = file("${path.module}/src/schema/refunds_${each.key}.json")
 }
+
+## Create landing table for raw prompt and response inputs
+resource "google_bigquery_table" "pubsub_reviews_dest_tables" {
+  for_each            = toset(var.review_resource_purpose)
+  project             = module.project-services.project_id
+  dataset_id          = google_bigquery_dataset.lineage_dataset.dataset_id
+  table_id            = "reviews_${each.key}"
+  deletion_protection = false
+
+  time_partitioning {
+    field = "publish_time"
+    type  = "HOUR"
+  }
+
+  schema = file("${path.module}/src/schema/reviews_${each.key}.json")
+}
+
 
 #Create resource connection for Vertex AI
 resource "google_bigquery_connection" "vertex_connection" {
@@ -371,7 +389,7 @@ resource "google_bigquery_routine" "sp_remote_function_create" {
 
 ## Create the stored procedure to create the cleaned prompt lineage table
 resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
-  for_each     = toset(var.resource_purpose)
+  for_each     = toset(var.review_resource_purpose)
   project      = module.project-services.project_id
   dataset_id   = google_bigquery_dataset.lineage_dataset.dataset_id
   routine_id   = "sp_${each.key}_cleaning_create"
@@ -383,7 +401,7 @@ resource "google_bigquery_routine" "sp_lineage_cleaning_create" {
     lineage_dataset_id = google_bigquery_dataset.lineage_dataset.dataset_id,
     }
   )
-  depends_on = [google_bigquery_table.pubsub_dest_tables]
+  depends_on = [google_bigquery_table.pubsub_reviews_dest_tables]
 }
 
 ## Create the stored procedure to create the cleaned prompt lineage table
@@ -395,8 +413,8 @@ resource "google_bigquery_routine" "sp_bigqueryml_model" {
   language     = "SQL"
 
   definition_body = templatefile("${path.module}/src/templates/sql/bqml_model.sql", {
-    project_id = module.project-services.project_id,
-    infra_dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+    project_id           = module.project-services.project_id,
+    infra_dataset_id     = google_bigquery_dataset.infra_dataset.dataset_id,
     marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
     }
   )
@@ -467,8 +485,8 @@ resource "google_bigquery_job" "customer_personas" {
 
   query {
     query = templatefile("${path.module}/src/templates/sql/customer_personas.sql", {
-      project_id = module.project-services.project_id,
-      infra_dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+      project_id           = module.project-services.project_id,
+      infra_dataset_id     = google_bigquery_dataset.infra_dataset.dataset_id,
       marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
       }
     )
@@ -493,12 +511,12 @@ resource "google_bigquery_routine" "sp_generate_email" {
   language     = "SQL"
 
   definition_body = templatefile("${path.module}/src/templates/sql/generate_email.sql", {
-    project_id = module.project-services.project_id,
-    infra_dataset_id = google_bigquery_dataset.infra_dataset.dataset_id,
+    project_id           = module.project-services.project_id,
+    infra_dataset_id     = google_bigquery_dataset.infra_dataset.dataset_id,
     marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
     }
   )
-   depends_on = [
+  depends_on = [
     module.workflow_polling_4,
     google_bigquery_job.customer_personas,
     google_bigquery_routine.sp_text_generate_create

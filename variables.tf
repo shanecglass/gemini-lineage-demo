@@ -44,10 +44,16 @@ variable "bq_dataset" {
   default     = "cymbal_sports"
 }
 
-variable "resource_purpose" {
+variable "refund_resource_purpose" {
   type        = set(string)
   description = "The purpose of the PubSub topics and subscriptions used to define resource ID"
-  default     = ["prompts", "responses"]
+  default     = ["prompts", "responses", "refunds"]
+}
+
+variable "review_resource_purpose" {
+  type = set(string)
+  description = "The purpose of PubSub topics and subscriptions used to define resource ID"
+  default = ["prompts", "responses"]
 }
 
 variable "sample_data_bucket" {
@@ -93,7 +99,7 @@ variable "deletion_protection" {
 }
 
 variable "create_ignore_service_accounts" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "If set to true, skip service account creation if a service account with the same email already exists."
 }

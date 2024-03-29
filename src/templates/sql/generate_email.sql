@@ -1,30 +1,32 @@
 CREATE OR REPLACE TEMP TABLE hold
 AS
 
-with prep AS (
-  SELECT
-  *
-  FROM (
+with subset AS (
   SELECT
     user_id,
-    DATE_DIFF(CURRENT_DATE(), CAST(MAX(order_created_date) as DATE), day) as days_since_order, ---RECENCY
-    COUNT(DISTINCT order_id) as count_orders, --FREQUENCY
-    AVG(sale_price) as avg_spend --MONETARY
-  FROM (
-    SELECT
-      user_id,
-      order_id,
-      sale_price,
-      created_at as order_created_date
-    FROM
-      `${project_id}.${infra_dataset_id}.order_items`
-    WHERE
-      created_at BETWEEN TIMESTAMP('2024-03-01 00:00:00')
-      AND TIMESTAMP('2024-03-31 00:00:00')
-      AND user_id = "82537"
-  )
-  GROUP BY user_id
- )
+    order_id,
+    SUM(sale_price) AS total_order_price,
+    created_at as order_created_date
+  FROM
+    `${project_id}.${infra_dataset_id}.order_items`
+  WHERE
+    created_at BETWEEN TIMESTAMP("2024-03-01 00:00:00")
+    AND TIMESTAMP("2024-03-31 00:00:00")
+    AND user_id = "82537"
+  GROUP BY
+    order_id, user_id, created_at
+),
+
+prep AS (
+  SELECT
+    user_id,
+    DATE_DIFF(CURRENT_DATE(), CAST(MAX(order_created_date) as DATE), day) as days_since_order, #RECENCY
+    COUNT(DISTINCT order_id) as count_orders, #FREQUENCY
+    AVG(total_order_price) as avg_spend #MONETARY
+  FROM
+    subset
+  GROUP BY
+    user_id
 ),
 
 products AS(
@@ -35,8 +37,8 @@ products AS(
     product_2.description AS product_2_description
   FROM (
     SELECT
-      ARRAY_AGG((SELECT AS STRUCT name, description FROM `${project_id}.${infra_dataset_id}.products` WHERE name = "Swift Performance Tee")) AS product_1_array,
-      ARRAY_AGG((SELECT AS STRUCT name, description FROM `${project_id}.${infra_dataset_id}.products` WHERE name = "Ascend Water Bottle")) AS product_2_array
+      ARRAY_AGG((SELECT AS STRUCT name, description FROM `${project_id}.${infra_dataset_id}.products` WHERE name = "Swift Performance Tee" )) AS product_1_array,
+      ARRAY_AGG((SELECT AS STRUCT name, description FROM `${project_id}.${infra_dataset_id}.products` WHERE name = "Ascend Water Bottle" )) AS product_2_array
     FROM
       `${project_id}.${infra_dataset_id}.products`),
     UNNEST(product_1_array) product_1,
@@ -45,9 +47,9 @@ products AS(
 
 
 SELECT
-  cluster.* EXCEPT(nearest_centroids_distance), persona.* EXCEPT (cluster), user.age AS age, user.state AS state, user.country AS country, products.*, first_name, last_name
+  cluster.* EXCEPT(nearest_centroids_distance), persona.* EXCEPT (cluster), user.age AS age, user.state AS state, user.country AS country, products.*, first_name, last_name, user.email AS user_email
   FROM
-    ML.PREDICT( MODEL ${project_id}.${marketing_dataset_id}.customer_segment_clustering`,
+    ML.PREDICT( MODEL `${project_id}.${marketing_dataset_id}.customer_segment_clustering`,
       (SELECT
         *
       FROM
@@ -55,12 +57,11 @@ SELECT
       )
     ) cluster, products
   JOIN
-    ${project_id}.${marketing_dataset_id}.customer_personas` persona ON cluster.centroid_id = persona.cluster
+    `${project_id}.${marketing_dataset_id}.customer_personas` persona ON cluster.centroid_id = persona.cluster
   JOIN
     `${project_id}.${infra_dataset_id}.users` user ON cluster.user_id = user.id
   LIMIT 1
 ;
-
 
 EXECUTE IMMEDIATE FORMAT(
   """
@@ -83,15 +84,15 @@ SELECT
         40 AS top_k,
         1 AS top_p,
         TRUE AS flatten_json_output
-      )) output, hold
+      )
+    ) output, hold
     WHERE
       REGEXP_EXTRACT(uri, r'^gs.*([0-9]{3}).png$') = '100'
   ;
   """,
 
-
 (SELECT
-  'You are a marketing expert for Cymbal Sports, an eCommerce sporting goods retailer. Rewrite the product description for the product in this image. The new description should be written to appeal to . You are writing a message to a customer named ' || hold.first_name || ' ' || hold.last_name || ' who is a ' || hold.age || ' year old male who lives in state: ' || hold.state || ' and country ' || hold.country || '. Their customer persona_name is ' || hold.persona_title || ' . Their persona_description is: ' || hold.persona_description || ' The original product description is ' || hold.product_1_description
+  'You are a marketing expert for Cymbal Sports, an eCommerce sporting goods retailer. Rewrite the product description for the product in this image. The new description should be written to appeal to a customer named ' || hold.first_name || ' ' || hold.last_name || ' who is a ' || hold.age || ' year old male who lives in state: ' || hold.state || ' and country ' || hold.country || '. Their customer persona_name is ' || hold.persona_title || ' . Their persona_description is: ' || hold.persona_description || ' The original product description is ' || hold.product_1_description
 FROM
   hold)
 );

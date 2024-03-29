@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+
+{% block styles %}
+{{ super() }}
+    <style>
+        body { background: #e8f1f9; }
+    </style>
+{% endblock %}
+
+
+{% block title %}
+Cymbal Sports Return Portal
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
+
+      <h1 class="pt-5 pb-2">Wait, which products?</h1>
+
+      <p class="lead">Great start Sport! Please select the item from your order to return</p>
+
+
+        {{ render_form(form) }}
+        {{ form.csrf_token }}
+
+      <p class="pt-5"><strong>{{ message }}</strong></p>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

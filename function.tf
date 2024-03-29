@@ -25,9 +25,9 @@ data "archive_file" "create_function_zip" {
 }
 
 resource "google_service_account" "cloud_function_manage_sa" {
-  project      = module.project-services.project_id
-  account_id   = "gemini-function-invoke-demo"
-  display_name = "Cloud Functions Service Account"
+  project                      = module.project-services.project_id
+  account_id                   = "gemini-function-invoke-demo"
+  display_name                 = "Cloud Functions Service Account"
   create_ignore_already_exists = var.create_ignore_service_accounts
 
   depends_on = [time_sleep.wait_after_apis]

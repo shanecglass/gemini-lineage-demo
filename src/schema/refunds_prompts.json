@@ -1,0 +1,66 @@
+[
+    {
+      "description": "Unique ID for messages",
+      "name": "message_id",
+      "type": "STRING"
+    },
+    {
+      "description": "The timestamp of when the Pub/Sub message was published. This is roughly equivalent to when the user submitted their request",
+      "name": "publish_time",
+      "type": "TIMESTAMP"
+    },
+    {
+      "description": "A unique identifier for each user",
+      "name": "user_id",
+      "type": "STRING"
+    },
+    {
+      "description": "A unique identifier for each order",
+      "name": "order_id",
+      "type": "STRING"
+    },
+    {
+      "description": "A unique identifier for each product",
+      "name": "product_id",
+      "type": "STRING"
+    },
+    {
+      "description": "The full text of the prompt that was generated from user input",
+      "name": "prompt",
+      "type": "STRING"
+    },
+    {
+      "description": "Gemini model version used",
+      "name": "model_version",
+      "type": "STRING"
+    },
+    {
+      "description": "Customer service policy used as an input",
+      "name": "policy_version",
+      "type": "FLOAT"
+    },
+    {
+      "name": "subscription_name",
+      "type": "STRING"
+    },
+    {
+      "description": "Pub/Sub message attributes",
+      "name": "attributes",
+      "type": "STRING"
+    },
+    {
+      "description": "STRING representation of the array of the text embeddings computed for the prompt using the Vertex AI Gecko text embedding model",
+      "name": "prompt_embedding",
+      "type": "STRING"
+    },
+    {
+      "description": "STRING representation of the array of the text embeddings computed for the user review using the Vertex AI Gecko text embedding model",
+      "name": "feedback_embedding",
+      "type": "STRING"
+    },
+    {
+      "description": "GCS URI of the submitted image",
+      "name": "request_image_uri",
+      "type": "STRING"
+    }
+  ]

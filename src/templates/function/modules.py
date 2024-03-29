@@ -15,9 +15,9 @@ from vertexai.vision_models import Image, MultiModalEmbeddingModel
 # Project ID
 project_id = os.environ['PROJECT_ID']
 # Pub/Sub Topic ID for prompt
-prompt_pubsub_topic_id = "gemini-multimodal-demo-prompts"
+prompt_pubsub_topic_id = "gemini-multimodal-demo-reviews-prompts"
 # Pub/Sub Topic ID for response
-response_pubsub_topic_id = "gemini-multimodal-demo-responses"
+response_pubsub_topic_id = "gemini-multimodal-demo-reviews-responses"
 # GCP region
 location = os.environ['REGION']
 
@@ -113,7 +113,7 @@ def publish_response_pubsub(review_id, response_text,
     dict = {"review_id": review_id,
             "response": response_text,
             "safety_attributes": safety_attributes,
-            "embedding": embedding}
+            "response_embedding": embedding}
     data_string = json.dumps(dict)
     data = data_string.encode("utf-8")
     future = publisher.publish(response_topic_path, data)

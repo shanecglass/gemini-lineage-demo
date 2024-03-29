@@ -36,10 +36,10 @@ resource "local_file" "notebook" {
   count    = length(local.notebook_names)
   filename = "${path.module}/src/templates/notebook_function/notebooks/${local.notebook_names[count.index]}.ipynb"
   content = templatefile("${path.module}/src/templates/notebooks/${local.notebook_names[count.index]}.ipynb", {
-    PROJECT_ID         = module.project-services.project_id,
-    INFRA_DATASET_ID         = google_bigquery_dataset.infra_dataset.dataset_id,
+    PROJECT_ID           = module.project-services.project_id,
+    INFRA_DATASET_ID     = google_bigquery_dataset.infra_dataset.dataset_id,
     MARKETING_DATASET_ID = google_bigquery_dataset.marketing_dataset.dataset_id,
-    LINEAGE_DATASET_ID = google_bigquery_dataset.lineage_dataset.dataset_id,
+    LINEAGE_DATASET_ID   = google_bigquery_dataset.lineage_dataset.dataset_id,
     }
   )
 }
@@ -145,7 +145,7 @@ resource "google_dataform_repository_iam_member" "workflow_manage_repo" {
   repository = local.notebook_names[count.index]
 
 
- depends_on = [
+  depends_on = [
     google_project_iam_member.workflow_service_account_roles,
     google_service_account_iam_member.workflow_auth_function,
     google_dataform_repository_iam_member.function_manage_repo,

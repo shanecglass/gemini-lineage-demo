@@ -1,0 +1,52 @@
+[
+      {
+        "description": "The timestamp of when the Pub/Sub message was published. This is roughly equivalent to when the user submitted their request",
+        "name": "publish_time",
+        "type": "TIMESTAMP"
+      },
+      {
+        "description": "A unique identifier for each user",
+        "name": "user_id",
+        "type": "STRING"
+      },
+      {
+        "description": "A unique identifier for each order",
+        "name": "order_id",
+        "type": "STRING"
+      },
+      {
+        "description": "A unique identifier for each product",
+        "name": "product_id",
+        "type": "STRING"
+      },
+      {
+        "description": "The full text of the response that was generated from user input",
+        "name": "response",
+        "type": "STRING"
+      },
+      {
+        "description": "Safety attributes associated with the response as determined by the model",
+        "name": "safety_attributes",
+        "type": "JSON"
+      },
+      {
+        "description": "The Pub/Sub message ID",
+        "name": "message_id",
+        "type": "STRING"
+      },
+      {
+        "description": "Name of the Pub/Sub subscription that wrote the data to BigQuery",
+        "name": "subscription_name",
+        "type": "STRING"
+      },
+      {
+        "description": "Pub/Sub message attributes",
+        "name": "attributes",
+        "type": "STRING"
+      },
+      {
+        "description": "STRING representation of the array of the text embeddings computed for the response using the Vertex AI Gecko text embedding model",
+        "name": "response_embedding",
+        "type": "STRING"
+      }
+    ]
