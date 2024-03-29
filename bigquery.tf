@@ -264,6 +264,8 @@ resource "google_bigquery_connection" "vertex_connection" {
 resource "google_project_iam_member" "vertex_connection_manage_roles" {
   for_each = toset([
     "roles/aiplatform.user",
+    "roles/cloudfunctions.invoker",
+    "roles/run.invoker",
     "roles/cloudtranslate.user",
     "roles/bigquery.connectionUser",
     "roles/serviceusage.serviceUsageConsumer",
@@ -379,7 +381,7 @@ resource "google_bigquery_routine" "sp_remote_function_create" {
     dataset_id    = google_bigquery_dataset.lineage_dataset.dataset_id,
     region        = var.multi_region,
     connection_id = google_bigquery_connection.vertex_connection.connection_id,
-    function_url  = google_cloudfunctions2_function.gaacsa.url,
+    function_url  = google_cloudfunctions2_function.customer_reviews.url,
     }
   )
   depends_on = [google_project_iam_member.function_manage_roles,
@@ -511,6 +513,27 @@ resource "google_bigquery_routine" "sp_generate_email" {
   language     = "SQL"
 
   definition_body = templatefile("${path.module}/src/templates/sql/generate_email.sql", {
+    project_id           = module.project-services.project_id,
+    infra_dataset_id     = google_bigquery_dataset.infra_dataset.dataset_id,
+    marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,
+    }
+  )
+  depends_on = [
+    module.workflow_polling_4,
+    google_bigquery_job.customer_personas,
+    google_bigquery_routine.sp_text_generate_create
+  ]
+}
+
+## Create the stored procedure to invoke the remote function to analyze customer reviews
+resource "google_bigquery_routine" "sp_invoke_function" {
+  project      = module.project-services.project_id
+  dataset_id   = google_bigquery_dataset.marketing_dataset.dataset_id
+  routine_id   = "sp_invoke_function"
+  routine_type = "PROCEDURE"
+  language     = "SQL"
+
+  definition_body = templatefile("${path.module}/src/templates/sql/sp_invoke_function.sql", {
     project_id           = module.project-services.project_id,
     infra_dataset_id     = google_bigquery_dataset.infra_dataset.dataset_id,
     marketing_dataset_id = google_bigquery_dataset.marketing_dataset.dataset_id,

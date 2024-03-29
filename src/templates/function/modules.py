@@ -32,7 +32,7 @@ vertexai.init(project=project_id,
 
 def get_text_embeddings(text_input):
     text_embed_model = TextEmbeddingModel.from_pretrained(
-        "textembedding-gecko@001")
+        "textembedding-gecko-multilingual@001")
     text_embeddings = text_embed_model.get_embeddings([text_input])
     text_embed_output = [
         text_embedding.values for text_embedding in text_embeddings]

@@ -15,17 +15,6 @@
  */
 
 
-# Create the notebook files to be uploaded
-# resource "local_file" "notebook" {
-#   filename = "${path.module}/src/templates/notebook_function/notebooks/gaacsa_walkthrough.ipynb"
-#   content = templatefile("${path.module}/src/templates/gaacsa_walkthrough.ipynb", {
-#     PROJECT_ID         = format("\\%s${module.project-services.project_id}\\%s", "\"", "\""),
-#     DATASET_ID         = format("\\%s${google_bigquery_dataset.infra_dataset.dataset_id}\\%s", "\"", "\""),
-#     LINEAGE_DATASET_ID = format("\\%s${google_bigquery_dataset.lineage_dataset.dataset_id}\\%s", "\"", "\""),
-#     }
-#   )
-# }
-
 locals {
   notebook_names = [
     for s in fileset("${path.module}/src/templates/notebooks/", "*.ipynb") : trimsuffix(s, ".ipynb")

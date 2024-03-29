@@ -167,4 +167,4 @@ template
 tmp/
 generate_order_items.py
 order_items.csv
-src/templates/notebook_function/notebooks/gaacsa_walkthrough.ipynb
+# src/templates/notebook_function/notebooks/*

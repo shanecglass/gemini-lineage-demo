@@ -1,10 +1,9 @@
-  #Gemini as a customer service agent
 WITH
   hold AS (
   SELECT
-    PARSE_JSON(`${project_id}.cymbal_sports_lineage.analyze_data` (review_id)) AS response
+    PARSE_JSON(`${project_id}.{marketing_dataset_id}.gemini_analysis` (review_id)) AS response
   FROM
-    `${project_id}.cymbal_sports.cleaned_reviews`
+    `${project_id}.${infra_dataset_id}.cleaned_reviews`
   WHERE
     sentiment = "negative"
     AND uri IS NOT NULL )

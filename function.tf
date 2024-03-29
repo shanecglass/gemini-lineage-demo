@@ -35,6 +35,7 @@ resource "google_service_account" "cloud_function_manage_sa" {
 
 resource "google_project_iam_member" "function_manage_roles" {
   for_each = toset([
+    "roles/aiplatform.user",
     "roles/bigquery.admin",       // Create jobs and modify BigQuery tables
     "roles/cloudfunctions.admin", // Service account role to manage access to the remote function
     "roles/iam.serviceAccountUser",
@@ -51,11 +52,11 @@ resource "google_project_iam_member" "function_manage_roles" {
   depends_on = [google_project_iam_member.vertex_connection_manage_roles]
 }
 
-resource "google_cloudfunctions2_function" "gaacsa" {
+resource "google_cloudfunctions2_function" "customer_reviews" {
   project     = module.project-services.project_id
   name        = "analyze-reviews"
   location    = "us-central1"
-  description = "Gemini as a Customer Service Agent to resolve product issues based on reviews"
+  description = "Use Gemini 1.0 Pro to analyze customer reviews and recommend actions"
 
   build_config {
     runtime     = "python311"
@@ -64,7 +65,7 @@ resource "google_cloudfunctions2_function" "gaacsa" {
     source {
       storage_source {
         bucket = google_storage_bucket.function_source.name
-        object = google_storage_bucket_object.gaacsa_function_source_upload.name
+        object = google_storage_bucket_object.customer_reviews_function_source_upload.name
       }
     }
   }
@@ -139,5 +140,5 @@ resource "google_cloudfunctions2_function" "notebook_deploy_function" {
 ## Wait for Function deployment to complete
 resource "time_sleep" "wait_after_function" {
   create_duration = "5s"
-  depends_on      = [google_cloudfunctions2_function.notebook_deploy_function, google_cloudfunctions2_function.gaacsa]
+  depends_on      = [google_cloudfunctions2_function.notebook_deploy_function, google_cloudfunctions2_function.customer_reviews]
 }
