@@ -72,9 +72,13 @@ Complete the steps listed in the `Walkthrough Guide for Data Preparation` notebo
 ### 3. **Invoke the RAG architecture query**
 From the BigQuery console SQL Workspace, call the [`sp_generate_email`](./src/templates/sql/generate_email.sql) stored procedure to invoke the RAG architecture in BigQuery and get the email output. You can also do so by running the following query:
 
-`CALL `cymbal_sports_marketing.sp_generate_email`();`
+```
+CALL `cymbal_sports_marketing.sp_generate_email`();
+```
 
 ### 4. **Use a remote function to analyze customer data!**
 Bonus points if you complete this one, since it wasn't shown on screen! Call the `sp_invoke_function` stored procedure to invoke the remote function and see how this can be used to analyze customer review data proactively and at scale.
 
-`CALL `cymbal_sports_marketing.sp_invoke_function`();`
+```
+CALL `cymbal_sports_marketing.sp_invoke_function`();
+```
