@@ -51,9 +51,9 @@ variable "refund_resource_purpose" {
 }
 
 variable "review_resource_purpose" {
-  type = set(string)
+  type        = set(string)
   description = "The purpose of PubSub topics and subscriptions used to define resource ID"
-  default = ["prompts", "responses"]
+  default     = ["prompts", "responses"]
 }
 
 variable "sample_data_bucket" {

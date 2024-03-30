@@ -61,7 +61,7 @@ resource "google_pubsub_subscription" "refunds_subs" {
   bigquery_config {
     table            = "${module.project-services.project_id}.${google_bigquery_dataset.lineage_dataset.dataset_id}.refunds_${each.key}"
     use_table_schema = true
-    write_metadata = true
+    write_metadata   = true
   }
   depends_on = [google_bigquery_dataset.lineage_dataset, google_pubsub_topic.refunds_topics]
 }
@@ -88,7 +88,7 @@ resource "google_pubsub_subscription" "review_subs" {
   bigquery_config {
     table            = "${module.project-services.project_id}.${google_bigquery_dataset.lineage_dataset.dataset_id}.reviews_${each.key}"
     use_table_schema = true
-    write_metadata = true
+    write_metadata   = true
   }
   depends_on = [google_bigquery_dataset.lineage_dataset, google_pubsub_topic.review_topics]
 }
