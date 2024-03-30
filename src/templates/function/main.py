@@ -106,15 +106,16 @@ def call_llm(inputs,
         embed_inputs = [context, review_image_uri, inventory_image_uri]
 
     prompt_embeddings = modules.get_embeddings(embed_inputs)
-    review_embeddings = modules.get_text_embeddings(review_text)
+    review_embeds = modules.get_text_embeddings(review_text)
     modules.publish_prompt_pubsub(
-        review_id,
-        review_embeddings,
-        context,
-        prompt_embeddings[0],
-        prompt_embeddings[1],
-        model_version,
-        policy_version)
+        review_id=str(review_id),
+        review_embeddings=review_embeds,
+        prompt=context,
+        text_embed=prompt_embeddings[0],
+        image_embed=prompt_embeddings[1],
+        model_version=model_version,
+        policy_version=policy_version)
+    print("prompt message sent")
 
     output = modules.get_response(model_version, prompt)
 
@@ -124,8 +125,11 @@ def call_llm(inputs,
     response_dict = json_repair.loads(response)
     response_embed = modules.get_text_embeddings(response)
     modules.publish_response_pubsub(
-        review_id, response,
-        safety_ratings, response_embed)
+        review_id=str(review_id),
+        response_text=response,
+        safety_attributes=safety_ratings,
+        embedding=response_embed)
+    print("response message sent")
     return response_dict
 
 

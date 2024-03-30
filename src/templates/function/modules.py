@@ -104,6 +104,7 @@ def publish_prompt_pubsub(review_id,
     data_string = json.dumps(dict)
     data = data_string.encode("utf-8")
     future = publisher.publish(prompt_topic_path, data)
+    print(f"Published prompt to {prompt_topic_path} for {review_id}")
     return (future)
 
 
@@ -117,4 +118,5 @@ def publish_response_pubsub(review_id, response_text,
     data_string = json.dumps(dict)
     data = data_string.encode("utf-8")
     future = publisher.publish(response_topic_path, data)
+    print(f"Published response to {response_topic_path} for {review_id}")
     return (future)

@@ -43,6 +43,7 @@ resource "google_project_iam_member" "function_manage_roles" {
     "roles/storage.objectAdmin", // Read/write GCS files
     "roles/dataform.admin",      // Edit access code resources
     "roles/iam.serviceAccountTokenCreator",
+    "roles/pubsub.publisher",
     ]
   )
   project = module.project-services.project_id
