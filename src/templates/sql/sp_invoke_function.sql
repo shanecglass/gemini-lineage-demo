@@ -1,7 +1,7 @@
 WITH
   hold AS (
   SELECT
-    PARSE_JSON(`${project_id}.{marketing_dataset_id}.gemini_analysis` (review_id)) AS response
+    PARSE_JSON(`${project_id}.${marketing_dataset_id}.gemini_analysis` (review_id)) AS response
   FROM
     `${project_id}.${infra_dataset_id}.cleaned_reviews`
   WHERE

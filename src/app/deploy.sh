@@ -1,9 +1,6 @@
-# PROJ=${PROJECT_ID}
-PROJ="data-quality-demo-next-24"
-# REGION=${REGION}
-REGION="us-central1"
-# OUTPUT_BUCKET=${OUTPUT_BUCKET}
-OUTPUT_BUCKET="gaacsa-0a81907e"
+PROJ=${PROJECT_ID}
+REGION=${REGION}
+OUTPUT_BUCKET=${OUTPUT_BUCKET}
 IMG_TAG="gcr.io/$PROJ/gemini-multimodal-demo"
 SERVICE_ACCOUNT="gemini-demo-app@$PROJ.iam.gserviceaccount.com"
 

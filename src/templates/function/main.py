@@ -121,13 +121,14 @@ def call_llm(inputs,
 
     output_dict = output.to_dict()
     safety_ratings = output_dict["candidates"][0]["safety_ratings"]
+    safety_ratings_string = json.dumps(safety_ratings)
     response = output.text
     response_dict = json_repair.loads(response)
     response_embed = modules.get_text_embeddings(response)
     modules.publish_response_pubsub(
         review_id=str(review_id),
         response_text=response,
-        safety_attributes=safety_ratings,
+        safety_attributes=safety_ratings_string,
         embedding=response_embed)
     print("response message sent")
     return response_dict

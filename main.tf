@@ -96,7 +96,7 @@ data "http" "cloud_run_uri" {
 ## Parse out the workflow execution state from the API call response
 locals {
   response_body = jsondecode(data.http.cloud_run_uri.response_body)
-  run_uri       = local.response_body.uri
-  depends_on    = [data.http.cloud_run_uri]
+  run_uri       = try(local.response_body.uri, "placeholder to pass validations")
+  depends_on    = [data.http.cloud_run_uri,  terraform_data.bld_and_deploy]
 }
 
