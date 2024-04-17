@@ -168,3 +168,4 @@ tmp/
 generate_order_items.py
 order_items.csv
 # src/templates/notebook_function/notebooks/*
+gemini-lineage-demo.code-workspace
